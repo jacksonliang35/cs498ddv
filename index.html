@@ -16,9 +16,10 @@ var svg = d3.select("#viz"),
     height = +svg.attr("height") - margin.top - margin.bottom,
     xScale = d3.scaleLinear().range([margin.left, width - margin.right]).domain([1982,2014]),
     yScale = d3.scaleLinear().range([height - margin.top, margin.bottom]).domain([0,90]),
-    xAxis = d3.svg.axis().scale(xScale),
-    yAxis = d3.svg.axis().scale(yScale);
+    xAxis = d3.axisBottom(xScale),
+    yAxis = d3.axisLeft(yScale);
     vis.append("svg:g").call(xAxis);
+    vis.append("svg:g").call(yAxis);
 // var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 

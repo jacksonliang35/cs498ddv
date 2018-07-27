@@ -29,7 +29,8 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
   console.log(columns);
   for (var i = 0; i < data.length; i++){
     var temp = [];
-    for (var col in columns){
+    for (var j = 0; j < columns.length; j++){
+      var col = columns[j];
       if(col != "UrbanArea" && col != "PopulationGroup")
         temp.push({"UrbanArea": data[i].UrbanArea,
                    "PopulationGroup": data[i].PopulationGroup,

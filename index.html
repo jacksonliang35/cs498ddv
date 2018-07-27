@@ -7,14 +7,20 @@
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <html><body>
 <h2>Hello World!</h2>
-<svg width="960" height="500" class="chart"></svg>
+<svg id="vis" width="1000" height="500" class="chart"></svg>
 <script>
 
-var svg = d3.select("svg"),
+var svg = d3.select("#viz"),
     margin = {top: 20, right: 20, bottom: 30, left: 40},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
-    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    xScale = d3.scale.linear().range([margin.left, width - margin.right]).domain([1982,2014]),
+    yScale = d3.scale.linear().range([height - margin.top, margin.bottom]).domain([0,90]),
+    xAxis = d3.svg.axis().scale(xScale),
+    yAxis = d3.svg.axis().scale(yScale);
+    vis.append("svg:g").call(xAxis);
+// var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
 
 
 d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
@@ -26,7 +32,6 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
   var vizdata = [];
   // Reconstruct data
   var columns = Object.keys(data[0]);
-  console.log(columns);
   for (var i = 0; i < data.length; i++){
     var temp = [];
     for (var j = 0; j < columns.length; j++){
@@ -38,6 +43,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
     }
     vizdata.push(temp);
   }
+
   console.log(vizdata[0]);
 });
 

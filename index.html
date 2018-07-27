@@ -1,12 +1,7 @@
 <!DOCTYPE html>
 <style>
-.arc text {
-font: 10px sans-serif;
-text-anchor: middle;
-}
-
-.arc path {
-stroke: #fff;
+.axis .domain {
+  display: none;
 }
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -14,53 +9,21 @@ stroke: #fff;
 <h2>Hello World!</h2>
 <svg width="960" height="500" class="chart"></svg>
 <script>
-d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(data) {
-    // First chart
-    var svg = d3.select("svg"),
-      width = +svg.attr("width"),
-      height = +svg.attr("height"),
-      radius = Math.min(width, height) / 2,
-      g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-    var color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b"]);
+var svg = d3.select("svg"),
+    margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom,
+    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var pie = d3.pie()
-      .sort(null)
-      .value(function(d) { return d.population; });
 
-    var path = d3.arc()
-      .outerRadius(radius - 10)
-      .innerRadius(0);
-
-    var label = d3.arc()
-      .outerRadius(radius - 40)
-      .innerRadius(radius - 40);
-
-    // Create count
-    var count = {"Very Large": 0,
-                 "Large": 0,
-                 "Medium": 0,
-                 "Small": 0};
-    var i;
-    for (i = 0; i < 101; i++){
-      count[data[i]['Population group']] += 1;
-    }
-    console.log(count)
-
-    var arc = g.selectAll(".arc")
-      .data(pie(count))
-      .enter().append("g")
-      .attr("class", "arc");
-
-    arc.append("path")
-        .attr("d", path)
-        .attr("fill", function(d) { return color(d.data.age); });
-
-    arc.append("text")
-        .attr("transform", function(d) { return "translate(" + label.centroid(d) + ")"; })
-        .attr("dy", "0.35em")
-        .text(function(d) { return d.data.age; });
-    });
+d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
+  for (var i = 2; i < columns.length; ++i) d[columns[i]] = +d[columns[i]];
+  // d.total = t;
+  return d;
+}, function(error, data) {
+  if (error) throw error;
+  console.log(data[0])
 });
 
 </script>

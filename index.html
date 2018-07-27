@@ -1,24 +1,67 @@
 <!DOCTYPE html>
+<style>
+.arc text {
+font: 10px sans-serif;
+text-anchor: middle;
+}
 
+.arc path {
+stroke: #fff;
+}
+</style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <html><body>
-<h1>Hello World!</h1>
-<svg class="chart"></svg>
+<h2>Hello World!</h2>
+<svg width="960" height="500" class="chart"></svg>
 <script>
-// d3.csv("https://github.com/jacksonliang35/cs498ddv/blob/master/data/cs498ddv_data.csv", function(d) {
-//   return {
-//     year: new Date(+d.Year, 0, 1), // convert "Year" column to Date
-//     make: d.Make,
-//     model: d.Model,
-//     length: +d.Length // convert "Length" column to number
-//   };
-// }).then(function(data) {
-//   console.log(data);
-// });
-var data = d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d) {
-  return d;
+d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(data) {
+    // First chart
+    var svg = d3.select("svg"),
+      width = +svg.attr("width"),
+      height = +svg.attr("height"),
+      radius = Math.min(width, height) / 2,
+      g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+    var color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b"]);
+
+    var pie = d3.pie()
+      .sort(null)
+      .value(function(d) { return d.population; });
+
+    var path = d3.arc()
+      .outerRadius(radius - 10)
+      .innerRadius(0);
+
+    var label = d3.arc()
+      .outerRadius(radius - 40)
+      .innerRadius(radius - 40);
+
+    // Create count
+    var count = {"Very Large": 0,
+                 "Large": 0,
+                 "Medium": 0,
+                 "Small": 0};
+    var i;
+    for (i = 0; i < 101; i++){
+      count[data[i]['Population group']] += 1;
+    }
+    console.log(count)
+
+    var arc = g.selectAll(".arc")
+      .data(pie(count))
+      .enter().append("g")
+      .attr("class", "arc");
+
+    arc.append("path")
+        .attr("d", path)
+        .attr("fill", function(d) { return color(d.data.age); });
+
+    // arc.append("text")
+    //     .attr("transform", function(d) { return "translate(" + label.centroid(d) + ")"; })
+    //     .attr("dy", "0.35em")
+    //     .text(function(d) { return d.data.age; });
+    });
 });
-console.log(data[50]);
 
 </script>
 </body></html>

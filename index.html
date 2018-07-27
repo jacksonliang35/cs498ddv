@@ -26,6 +26,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
   var vizdata = [];
   // Reconstruct data
   var columns = data[0].keys;
+  console.log(columns);
   for (var i = 0; i < data.length; i++){
     var temp = [];
     for (var col in columns){

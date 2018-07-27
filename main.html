@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<script src="http://d3js.org/d3.v4.min.js"></script>
+<html><body>
+<svg class="chart"></svg>
+<script>
+// d3.csv("https://github.com/jacksonliang35/cs498ddv/blob/master/data/cs498ddv_data.csv", function(d) {
+//   return {
+//     year: new Date(+d.Year, 0, 1), // convert "Year" column to Date
+//     make: d.Make,
+//     model: d.Model,
+//     length: +d.Length // convert "Length" column to number
+//   };
+// }).then(function(data) {
+//   console.log(data);
+// });
+d3.csv("/data/cs498ddv_data.csv", function(data) {
+  console.log(data[0]);
+});
+
+</script>
+</body></html>

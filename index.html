@@ -23,7 +23,19 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
   return d;
 }, function(error, data) {
   if (error) throw error;
-  console.log(data[0])
+  var vizdata = [];
+  // Reconstruct data
+  for (var i = 0; i < data.length){
+    var temp = [];
+    for (var col in data[i]){
+      if(col != "UrbanArea" && col != "PopulationGroup")
+        temp.push({"UrbanArea": data[i].UrbanArea,
+                   "PopulationGroup": data[i].PopulationGroup,
+                   col: data[i].col});
+    }
+    vizdata.push(temp);
+  }
+  console.log(vizdata[0]);
 });
 
 </script>

@@ -30,11 +30,9 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
     var temp = [];
     for (var col in columns){
       if(col != "UrbanArea" && col != "PopulationGroup")
-        var obj = {};
-        obj["UrbanArea"] = data[i].UrbanArea;
-        obj["PopulationGroup"] = data[i].PopulationGroup;
-        obj[col] = data[i][col];
-        temp.push(obj);
+        temp.push({"UrbanArea": data[i].UrbanArea,
+                   "PopulationGroup": data[i].PopulationGroup,
+                   [col]: data[i][col]});
     }
     vizdata.push(temp);
   }

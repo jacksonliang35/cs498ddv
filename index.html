@@ -25,13 +25,14 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
   if (error) throw error;
   var vizdata = [];
   // Reconstruct data
+  var columns = data[0].keys;
   for (var i = 0; i < data.length; i++){
     var temp = [];
-    for (var col in data[i]){
+    for (var col in columns){
       if(col != "UrbanArea" && col != "PopulationGroup")
         temp.push({"UrbanArea": data[i].UrbanArea,
                    "PopulationGroup": data[i].PopulationGroup,
-                   col: data[i].col});
+                   "" + col: data[i][col]});
     }
     vizdata.push(temp);
   }

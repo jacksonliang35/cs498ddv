@@ -18,8 +18,8 @@ var svg = d3.select("#viz"),
     yScale = d3.scaleLinear().range([height - margin.top, margin.bottom]).domain([0,90]),
     xAxis = d3.axisBottom(xScale),
     yAxis = d3.axisLeft(yScale);
-    vis.append("svg:g").call(xAxis);
-    vis.append("svg:g").call(yAxis);
+    svg.append("svg:g").call(xAxis);
+    svg.append("svg:g").call(yAxis);
 // var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 

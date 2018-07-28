@@ -24,7 +24,7 @@ body { font: 12px Arial;}
   /* margin: auto; */
   max-width: 200px;
   border:2px solid purple;
-  visibility: hidden;
+  visibility: visible;
   z-index: 10;
 }
 </style>
@@ -204,18 +204,9 @@ function display_total(){
 
 /********** function to filter color *********/
 function filter(area, data){
-  // Find new data
-  nd = [];
-  for (var i = 0; i < data.length; i++){
-    if (data[i].UrbanArea === area){
-      nd.push(data[i]);
-    }
-  }
-  // Change chart
   d3.select("#lc")
-    .data(nd)
-    .exit().attr("visibility", "hidden")
-    .enter().attr("visibility", "visible")
+    .selectAll("g").attr("visibility", "hidden")
+    .selectAll("[color=" + color[area] + "]").attr("visibility", "visible")
 }
 
 </script>

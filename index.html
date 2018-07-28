@@ -9,18 +9,16 @@
   stroke-width: 2px;
 }
 .dot {
-  fill: black;
-  stroke: black;
   r: 2;
 }
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <html><body>
 <h2>Hello World!</h2>
-<svg id="viz" width="1000" height="500" class="chart"></svg>
+<svg id="viz" width="800" height="500" class="chart"></svg>
 <script>
 // Define color space
-var color = {"Very large": "cyan", "Large": "blue", "Medium": "orange", "Small": "red"};
+var color = {"Very large": "cyan", "Large": "steelblue", "Medium": "orange", "Small": "red"};
 
 // Define canvas
 var svg = d3.select("#viz"),
@@ -43,6 +41,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
   if (error) throw error;
   // Reformat data
   var vizdata = [];
+  var vizdata2 = [];
   var columns = Object.keys(data[0]);
   var ignore_list = ["UrbanArea", "PopulationGroup", "STPercent", "STRank", "LTPercent", "LTRank"];
   for (var i = 0; i < data.length; i++){
@@ -51,6 +50,10 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       var col = columns[j];
       if(!ignore_list.includes(col)){
         temp.push({"UrbanArea": data[i].UrbanArea,
+                   "PopulationGroup": data[i].PopulationGroup,
+                   "Hours": +data[i][col],
+                   "Year": +col});
+        vizdata2.push({"UrbanArea": data[i].UrbanArea,
                    "PopulationGroup": data[i].PopulationGroup,
                    "Hours": +data[i][col],
                    "Year": +col});
@@ -94,12 +97,28 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("class", "line")
         .attr("d", line);
   }
-  // g.selectAll(".dot")
-  //     .data(vizdata[i])
-  //     .enter().append("circle")
-  //     .attr("class", "dot")
-  //     .attr("cx", function(d) { return xScale(d.Year) })
-  //     .attr("cy", function(d) { return yScale(d.Hours) });
+  // Tooltip
+  var tooltip = d3.select("body")
+    .append("div")
+    .style("position", "absolute")
+    .style("z-index", "10")
+    .style("visibility", "hidden")
+    .style("background", "#000")
+    .text("a simple tooltip");
+  // Dots
+  g.selectAll(".dot")
+      .data(vizdata2)
+      .enter().append("circle")
+      .attr("class", "dot")
+      .attr("cx", function(d) { return xScale(d.Year) })
+      .attr("cy", function(d) { return yScale(d.Hours) })
+      .attr("fill", function(d) { return color[d.PopulationGroup]})
+      .attr("stroke", function(d) { return color[d.PopulationGroup]})
+      // Mouse event
+      .on("mouseover", function(d){tooltip.text(d.UrbanArea); return tooltip.style("visibility", "visible");})
+      .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+
+
 });
 
 </script>

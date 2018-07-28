@@ -24,6 +24,8 @@ body { font: 12px Arial;}
   /* margin: auto; */
   max-width: 200px;
   border:2px solid purple;
+  visibility: hidden;
+  z-index: 10;
 }
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -60,10 +62,6 @@ var stack = d3.stack();
 var tooltip = d3.select("body")
   .append("div")
   .style("position", "absolute")
-  .style("z-index", "10")
-  .style("visibility", "hidden")
-  .style("background", "#000")
-  .text("a simple tooltip");
 
 /********* below are for line chart **********/
 d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
@@ -90,10 +88,10 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
                    "PopulationGroup": data[i].PopulationGroup,
                    "Hours": +data[i][col],
                    "Year": +col});
-        vizdata2.push({"UrbanArea": data[i].UrbanArea,
-                   "PopulationGroup": data[i].PopulationGroup,
-                   "Hours": +data[i][col],
-                   "Year": +col});
+        // vizdata2.push({"UrbanArea": data[i].UrbanArea,
+        //            "PopulationGroup": data[i].PopulationGroup,
+        //            "Hours": +data[i][col],
+        //            "Year": +col});
       }
     }
     vizdata.push(temp);
@@ -121,7 +119,8 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       .text("Hours");
 
   for (var i = 0; i < vizdata.length; i++){
-    var line = linechart.append("g");
+    var line = linechart.append("g")
+                        .attr("id", i);
     // Line
     line.append("path")
         .attr("stroke", color[vizdata[i][0].PopulationGroup])
@@ -131,15 +130,20 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
     // Dots
     line.selectAll(".dot")
         .data(vizdata[i])
-        .enter().append("circle")
+        .enter()
+        .append("circle")
         .attr("class", "dot")
         .attr("cx", function(d) { return x(d.Year) })
         .attr("cy", function(d) { return y(d.Hours) })
         .attr("fill", function(d) { return color[d.PopulationGroup]})
         .attr("stroke", function(d) { return color[d.PopulationGroup]})
+        .append("div")
+        .attr("top", function(d) { return x(d.Year) })
+        .attr("left", function(d) { return y(d.Hours) })
+        .attr("text", function(d) { return d.UrbanArea })
         // Mouse event
-        .on("mouseover", function(d){tooltip.text(d.UrbanArea); return tooltip.style("visibility", "visible");})
-        .on("mouseout", function(){return tooltip.style("visibility", "hidden");})
+        .on("mouseover", function(){ return d3.select(this).style("visibility", "visible"); })
+        .on("mouseout", function(){ return d3.select(this).style("visibility", "hidden"); })
         .on("click", display_total);
   }
 

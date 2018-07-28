@@ -61,7 +61,7 @@ var stack = d3.stack();
 // Tooltip
 var tooltip = d3.select("body")
   .append("div")
-  .style("position", "absolute")
+  .style("position", "absolute");
 
 /********* below are for line chart **********/
 d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
@@ -136,16 +136,10 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("cx", function(d) { return x(d.Year) })
         .attr("cy", function(d) { return y(d.Hours) })
         .attr("fill", function(d) { return color[d.PopulationGroup]})
-        .attr("stroke", function(d) { return color[d.PopulationGroup]});
-    line.selectAll("div")
-        .data(vizdata[i])
-        .enter().append("div")
-        .attr("top", function(d) { return x(d.Year) })
-        .attr("left", function(d) { return y(d.Hours) })
-        .attr("text", function(d) { return d.UrbanArea })
+        .attr("stroke", function(d) { return color[d.PopulationGroup]})
         // Mouse event
-        .on("mouseover", function(){ return d3.select(this).style("visibility", "visible"); })
-        .on("mouseout", function(){ return d3.select(this).style("visibility", "hidden"); })
+        .on("mouseover", function(d){ tooltip.style("text", d.UrbanArea); return tooltip.style("visibility", "visible"); })
+        .on("mouseout", function(){ return tooltip.style("visibility", "hidden"); })
         .on("click", display_total);
   }
 
@@ -209,11 +203,19 @@ function display_total(){
 }
 
 /********** function to filter color *********/
-function filter(area){
+function filter(area, data){
   // Find new data
-
+  nd = [];
+  for (var i = 0; i < data.length; i++){
+    if (data[i].UrbanArea === area){
+      nd.push(data[i]);
+    }
+  }
   // Change chart
-  // d3.select("#lc")
+  d3.select("#lc")
+    .data(nd)
+    .exit().attr("visibility", "hidden")
+    .enter().attr("visibility", "visible")
 }
 
 </script>

@@ -26,7 +26,7 @@ body { font: 12px Arial;}
 <script>
 // Define color space and legend
 var color = {"Very large": "cyan", "Large": "steelblue", "Medium": "orange", "Small": "red"},
-    legend = ["Very large", "Large", "Medium", "Small"];
+    labels = ["Very large", "Large", "Medium", "Small"];
 
 // Define canvas
 var svg = d3.select("#viz"),
@@ -120,7 +120,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
   }
   // Legend
   var legend = g.selectAll(".legend")
-    .data(legend)
+    .data(labels)
     .enter().append("g")
       .attr("class", "legend")
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });

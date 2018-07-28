@@ -34,7 +34,8 @@ var svg = d3.select("#viz"),
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
     x = d3.scaleLinear()
-          .rangeRound([0, width]),
+          .rangeRound([0, width])
+          .domain([1982,2014]),
           // .padding(0.3)
           // .align(0.3),
     y = d3.scaleLinear()
@@ -62,9 +63,10 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
   return d;
 }, function(error, data) {
   if (error) throw error;
-  // Get axes range
-  x.domain([1982,2014]);
+
+  // Get y axis range
   y.domain([0,90]);
+
   // Reformat data
   var vizdata = [],
       vizdata2 = [],
@@ -93,17 +95,17 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
   g.append("g")
       .attr("class", "axis axis--x")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x).ticks(10, "s"))
-   .append("text")
-      .attr("transform", "translate(" + (width/2) + " ," + (height + margin.top + 20) + ")")
+      .call(d3.axisBottom(x).ticks(20, "s").tickFormat(d3.format("")));
+  g.append("text")
+      .attr("transform", "translate(" + (width/2) + " ," + (height + margin.top) + ")")
       .text("Year");
 
 
   // Add y Axis
   g.append("g")
       .attr("class", "axis axis--y")
-      .call(d3.axisLeft(y))
-   .append("text")
+      .call(d3.axisLeft(y).tickFormat(d3.format("")));
+  g.append("text")
       .attr("transform", "rotate(-90)")
       .attr("y", 0 - margin.left)
       .attr("x",0 - (height / 2))
@@ -162,13 +164,12 @@ function display_total(){
   }, function(error, data) {
     if (error) throw error;
 
-    console.log(data);
-
-    xbar.domain(data.map(function(d) { return d.Year; }));
-    ybar.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
+    // console.log(data);
+    // Change y axis domain
+    y.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
 
     // Apply transition
-    var g = d3.select("svg:g").transition();
+    // var g = d3.select("svg:g").transition();
 
     g.selectAll(".serie")
       .data(stack.keys(data.columns.slice(0,4))(data))
@@ -178,28 +179,10 @@ function display_total(){
       .selectAll("rect")
       .data(function(d) { return d; })
       .enter().append("rect")
-        .attr("x", function(d) { return xbar(d.data.Year); })
-        .attr("y", function(d) { return ybar(d[1]); })
-        .attr("height", function(d) { return ybar(d[0]) - ybar(d[1]); })
-        .attr("width", xbar.bandwidth());
-
-    g.append("g")
-        .attr("class", "axis axis--x")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(xbar))
-     .append("text")
-        .attr("transform", "translate(" + (width/2) + " ," + (height + margin.top + 20) + ")")
-        .text("Year");
-
-    g.append("g")
-        .attr("class", "axis axis--y")
-        .call(d3.axisLeft(ybar).ticks(10, "s"))
-      .append("text")
-        .attr("x", 2)
-        .attr("y", ybar(ybar.ticks(10).pop()))
-        .attr("dy", "0.35em")
-        .attr("fill", "#000")
-        .text("Hours");
+        .attr("x", function(d) { return x(d.data.Year); })
+        .attr("y", function(d) { return y(d[1]); })
+        .attr("height", function(d) { return y(d[0]) - y(d[1]); })
+        .attr("width", x.bandwidth());
   });
 }
 

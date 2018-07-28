@@ -77,10 +77,10 @@ d3.select("body")
   .data(btn)
   .enter().append("div")
   .on("click", function(d){ return alert(d); })
-  .attr("text", function(d) { return 0 ? "about" : d; })
   .attr("left", function(d, i) { return i * 50; })
   .attr("width", "50px")
-  .attr("top", "300px");
+  .attr("top", "300px")
+  .text(function(d) { return 0 ? "about" : d; });
 
 /********* below are for line chart **********/
 d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
@@ -157,7 +157,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("fill", function(d) { return color[d.PopulationGroup]})
         .attr("stroke", function(d) { return color[d.PopulationGroup]})
         // Mouse event
-        .on("mouseover", function(d){ tooltip.style("text", d.UrbanArea); return tooltip.style("visibility", "visible"); })
+        .on("mouseover", function(d){ tooltip.text(d.UrbanArea); return tooltip.style("visibility", "visible"); })
         .on("mouseout", function(){ return tooltip.style("visibility", "hidden"); })
         // .on("mouseover", handleMouseOver)
         // .on("mouseout", handleMouseOut)

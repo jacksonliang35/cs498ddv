@@ -179,7 +179,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("x", function(d) { return xbar(d.data.Year); })
         .attr("y", function(d) { return ybar(d[1]); })
         .attr("height", function(d) { return ybar(d[0]) - ybar(d[1]); })
-        .attr("width", x.bandwidth());
+        .attr("width", xbar.bandwidth());
 
     // g.append("g")
     //     .attr("class", "axis axis--x")

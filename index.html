@@ -1,7 +1,12 @@
 <!DOCTYPE html>
-<style>
+<style> /* set the CSS */
 .axis .domain {
   display: none;
+}
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
 }
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -16,12 +21,10 @@ var svg = d3.select("#viz"),
     height = +svg.attr("height") - margin.top - margin.bottom,
     xScale = d3.scaleLinear().range([margin.left, width - margin.right]).domain([1982,2014]),
     yScale = d3.scaleLinear().range([height - margin.top, margin.bottom]).domain([0,90]),
-    xAxis = d3.axisBottom(xScale),
-    yAxis = d3.axisLeft(yScale);
-    svg.append("svg:g").call(xAxis);
-    svg.append("svg:g").call(yAxis);
-// var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
+    // define the line
+    valueline = d3.line().x(function(d) { return x(d.Year); })
+                         .y(function(d) { return y(d.Hours); }),
+    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
 d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
@@ -30,22 +33,56 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
   return d;
 }, function(error, data) {
   if (error) throw error;
+  // Reformat data
   var vizdata = [];
-  // Reconstruct data
   var columns = Object.keys(data[0]);
+  var ignore_list = ["UrbanArea", "PopulationGroup", "STPercent", "STRank", "LTPercent", "LTRank"];
   for (var i = 0; i < data.length; i++){
     var temp = [];
     for (var j = 0; j < columns.length; j++){
       var col = columns[j];
-      if(col != "UrbanArea" && col != "PopulationGroup")
+      if(!(col in ignore_list))
         temp.push({"UrbanArea": data[i].UrbanArea,
                    "PopulationGroup": data[i].PopulationGroup,
-                   [col]: data[i][col]});
+                   "Hours": data[i][col],
+                   "Year": [col.slice(4)]});
     }
     vizdata.push(temp);
   }
-
   console.log(vizdata[0]);
+
+  // Add x axis
+  g.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(xScale));
+
+  // text label for the x axis
+  g.append("text")
+      .attr("transform",
+            "translate(" + (width/2) + " ," +
+                           (height + margin.top + 20) + ")")
+      .style("text-anchor", "middle")
+      .text("Year");
+
+  // Add the y Axis
+  g.append("g")
+      .call(d3.axisLeft(yScale));
+
+  // text label for the y axis
+  g.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x",0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Hours");
+
+  // Add path
+  g.append("path")
+      .data(vizdata[0])
+      .attr("class", "line")
+      .attr("d", valueline);
+
 });
 
 </script>

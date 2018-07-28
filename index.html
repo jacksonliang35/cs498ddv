@@ -45,8 +45,8 @@ var xbar = d3.scaleBand()
       .align(0.3),
     ybar = d3.scaleLinear()
       .rangeRound([height, 0]),
-    zbar = d3.scaleOrdinal()
-      .range(['cyan', 'steelblue', 'orange', 'red']),
+    // zbar = d3.scaleOrdinal()
+    //   .range(['cyan', 'steelblue', 'orange', 'red']),
     stack = d3.stack();
 
 // Tooltip
@@ -157,7 +157,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
 */
 //function display_total(){
   d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/total_count.csv", function(d, i, columns) {
-    for (var i = 1, t = 0; i < columns.length; ++i) t += d[columns[i]] = +d[columns[i]];
+    for (var i = 0, t = 0; i < columns.length - 1; ++i) t += d[columns[i]] = +d[columns[i]];
     d.total = t;
     return d;
   }, function(error, data) {
@@ -167,13 +167,13 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
 
     xbar.domain(data.map(function(d) { return d.Year; }));
     ybar.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
-    zbar.domain(data.columns.slice(1));
+    // zbar.domain(data.columns.slice(0,4));
 
     g.selectAll(".serie")
-      .data(stack.keys(data.columns.slice(1))(data))
+      .data(stack.keys(data.columns.slice(5))(data))
       .enter().append("g")
         .attr("class", "serie")
-        .attr("fill", function(d) { return zbar(d.key); })
+        .attr("fill", function(d) { return color[d.key]; })
       .selectAll("rect")
       .data(function(d) { return d; })
       .enter().append("rect")
@@ -208,7 +208,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("x", width + 18)
         .attr("width", 18)
         .attr("height", 18)
-        .attr("fill", zbar);
+        .attr("fill", function(d) { return color[d.key]; });
 
     legend.append("text")
         .attr("x", width + 44)

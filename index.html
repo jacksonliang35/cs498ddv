@@ -59,15 +59,18 @@ var linefunction = d3.line().x(function(d) { return x(d.Year); })
 var stack = d3.stack();
 
 // Tooltip
-var tooltip = d3.select("body")
+var tooltip = d3.select("#lc")
   .append("div")
   .style("position", "absolute")
-  .style("display", "block")
   .style("background", "white")
   .style("max-width", "200px")
   .style("border", "2px solid purple")
   .style("visibility", "visible")
   .style("z-index", "10");
+
+// Button
+var button = [1,2,3];
+// d3.select("body").selectAll
 
 /********* below are for line chart **********/
 d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
@@ -176,6 +179,8 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
 
 /********* below are for bar chart, called by an update function **********/
 function display_total(){
+  // Close tooltip
+  tooltip.style("visibility", "hidden")
   d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/total_count.csv", function(d, i, columns) {
     for (var i = 0, t = 0; i < columns.length - 1; ++i) t += d[columns[i]] = +d[columns[i]];
     d.total = t;

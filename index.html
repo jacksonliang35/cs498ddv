@@ -51,8 +51,8 @@ var svg = d3.select("#viz"),
     linechart = g.append("g");
 
 // Define line function
-var line = d3.line().x(function(d) { return x(d.Year); })
-                    .y(function(d) { return y(d.Hours); });
+var linefunction = d3.line().x(function(d) { return x(d.Year); })
+                            .y(function(d) { return y(d.Hours); });
 // Define bar function
 var stack = d3.stack();
 
@@ -127,7 +127,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("stroke", color[vizdata[i][0].PopulationGroup])
         .datum(vizdata[i])
         .attr("class", "line")
-        .attr("d", line);
+        .attr("d", linefunction);
     // Dots
     line.selectAll(".dot")
         .data(vizdata[i])
@@ -157,7 +157,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       .attr("width", 18)
       .attr("height", 18)
       .attr("fill", function(d) { return color[d]; })
-      .on("click", );
+      .on("click", filter);
 
   legend.append("text")
       .attr("x", width + 44)
@@ -180,16 +180,14 @@ function display_total(){
     // console.log(data);
     // Change y axis domain
     y.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
+    linechart.remove();
+    var barchart = g.append("g");
 
     // Apply transition
     // var svg = d3.select("svg").transition();
 
-    g.selectAll(".dot").data([]).exit().remove();
 
-    for (var i = 0; i < 101; i++){
-      g.select("path").data([]).exit().remove();
-    }
-    g.selectAll(".serie")
+    barchart.selectAll(".serie")
       .data(stack.keys(data.columns.slice(0,4))(data))
       .enter().append("g")
         .attr("class", "serie")

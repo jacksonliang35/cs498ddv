@@ -16,15 +16,14 @@
 <script>
 
 var svg = d3.select("#viz"),
-    margin = {top: 20, right: 20, bottom: 40, left: 40},
+    margin = {top: 40, right: 40, bottom: 40, left: 40},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
     xScale = d3.scaleLinear().range([margin.left, width - margin.right]).domain([1982,2014]),
     yScale = d3.scaleLinear().range([height - margin.top, margin.bottom]).domain([0,90]),
     // define the line
     line = d3.line().x(function(d) { return xScale(d.Year); })
-                    .y(function(d) { return yScale(d.Hours); })
-                    .interpolate('linear'),
+                    .y(function(d) { return yScale(d.Hours); }),
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 

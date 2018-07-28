@@ -16,7 +16,7 @@
 <script>
 
 var svg = d3.select("#viz"),
-    margin = {top: 20, right: 20, bottom: 30, left: 40},
+    margin = {top: 20, right: 20, bottom: 40, left: 40},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
     xScale = d3.scaleLinear().range([margin.left, width - margin.right]).domain([1982,2014]),
@@ -41,11 +41,12 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
     var temp = [];
     for (var j = 0; j < columns.length; j++){
       var col = columns[j];
-      if(!(col in ignore_list))
+      if(!ignore_list.includes(col)){
         temp.push({"UrbanArea": data[i].UrbanArea,
                    "PopulationGroup": data[i].PopulationGroup,
                    "Hours": data[i][col],
-                   "Year": [col.slice(4)]});
+                   "Year": [col]});
+      }
     }
     vizdata.push(temp);
   }

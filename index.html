@@ -58,7 +58,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
     }
     vizdata.push(temp);
   }
-  console.log(color[vizdata[0].PopulationGroup]);
+  console.log(color[vizdata[0][0].PopulationGroup]);
 
   // Add x axis
   g.append("g")
@@ -89,7 +89,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
   // Add path
   for (var i = 0; i < 2; i++){
     g.append("path")
-        .attr("stroke", color[vizdata[i].PopulationGroup])
+        .attr("stroke", color[vizdata[i][0].PopulationGroup])
         .datum(vizdata[i])
         .attr("class", "line")
         .attr("d", line);

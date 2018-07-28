@@ -62,15 +62,15 @@ var stack = d3.stack();
 var tooltip = d3.select("body")
   .append("div")
   .style("left", "100px")
-  .style("top", "100px")
-  .style("background", "white")
+  .style("top", "500px")
+  .style("background", "yellow")
   .style("max-width", "200px")
   .style("border", "2px solid purple")
   .style("visibility", "visible")
   .style("z-index", "150");
 
 // Button
-var btn = [1, 2, 3];
+var btn = [0, 1, 2, 3];
 d3.select("body")
   .selectAll("button")
   .data(btn)
@@ -78,7 +78,7 @@ d3.select("body")
   .attr("onclick", function(d){ return alert(d); })
   .style("left", "300px")
   .style("top", "300px")
-  .text(function(d) { return d; })
+  .text(function(d) { return 0 ? "about" : d; })
   .style("z-index", "150");
 
 /********* below are for line chart **********/

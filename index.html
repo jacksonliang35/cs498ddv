@@ -156,7 +156,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
 */
 //function display_total(){
   d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/total_count.csv", function(d, i, columns) {
-    for (var i = 2, var t = 0; i < columns.length; ++i) t += d[columns[i]] = +d[columns[i]];
+    for (var i = 1, t = 0; i < columns.length; ++i) t += d[columns[i]] = +d[columns[i]];
     d.total = t;
     return d;
   }, function(error, data) {
@@ -207,7 +207,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("x", width + 18)
         .attr("width", 18)
         .attr("height", 18)
-        .attr("fill", z);
+        .attr("fill", zbar);
 
     legend.append("text")
         .attr("x", width + 44)

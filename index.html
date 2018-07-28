@@ -22,9 +22,9 @@ var svg = d3.select("#viz"),
     xScale = d3.scaleLinear().range([margin.left, width - margin.right]).domain([1982,2014]),
     yScale = d3.scaleLinear().range([height - margin.top, margin.bottom]).domain([0,90]),
     // define the line
-    valueline = d3.line().x(function(d) { return d.Year; })
-                         .y(function(d) { return d.Hours; })
-                         .interpolate('linear'),
+    line = d3.line().x(function(d) { return xScale(d.Year); })
+                    .y(function(d) { return yScale(d.Hours); })
+                    .interpolate('linear'),
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
@@ -51,7 +51,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
     }
     vizdata.push(temp);
   }
-  console.log(vizdata[0].Year);
+  console.log(vizdata[0]);
 
   // Add x axis
   g.append("g")
@@ -81,10 +81,9 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
 
   // Add path
   g.append("path")
-      .attr("d", valueline(vizdata[0]))
-      .attr("stroke", "blue")
-      .attr("stroke-width", 2)
-      .attr("fill", "none");
+      .datum(vizdata[0])
+      .attr("class", "line")
+      .attr("d", line);
 
 });
 

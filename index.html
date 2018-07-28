@@ -74,13 +74,13 @@ var tooltip = d3.select("body")
 // Button
 var btn = [0, 1, 2, 3];
 d3.select("body")
-  .selectAll("button")
+  .selectAll("div")
   .data(btn)
-  .enter().append("button")
-  .attr("onclick", function(d){ return alert(d); })
+  .enter().append("div")
+  .on("click", function(d){ return alert(d); })
+  .style("text", function(d) { return 0 ? "about" : d; })
   .style("left", "300px")
   .style("top", "300px")
-  .text(function(d) { return 0 ? "about" : d; })
   .style("z-index", "150");
 
 /********* below are for line chart **********/
@@ -237,7 +237,7 @@ function filter(area, data){
 function handleMouseOver(d, i){
     // Use D3 to select element, change size
     d3.select(this).attr({
-      r: radius * 2
+      r: 6
     });
 
     // Specify where to put label of text
@@ -253,7 +253,7 @@ function handleMouseOver(d, i){
 
 function handleMouseOut(d, i) {
     d3.select(this).attr({
-      r: radius
+      r: 2
     });
 
     // Select text by id and then remove

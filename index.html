@@ -62,14 +62,13 @@ var stack = d3.stack();
 var tooltip = d3.select("body")
   .append("div")
   .attr("class", "tooltip")
-  .style("left", "100px")
-  .style("top", "500px")
-  .style("height", "50px")
-  .style("width", "250px")
-  .style("background", "yellow")
-  .style("border", "2px solid purple")
-  .style("visibility", "visible")
-  .style("z-index", "150");
+  .attr("left", "100px")
+  .attr("top", "500px")
+  .attr("height", "50px")
+  .attr("width", "250px")
+  .attr("background", "yellow")
+  .attr("border", "2px solid purple")
+  .attr("visibility", "visible")
 
 // Button
 var btn = [0, 0, 1, 2, 3];
@@ -78,11 +77,10 @@ d3.select("body")
   .data(btn)
   .enter().append("div")
   .on("click", function(d){ return alert(d); })
-  .style("text", function(d) { return 0 ? "about" : d; })
-  .style("left", function(d, i) { return i * 50; })
-  .style("width", "50px")
-  .style("top", "300px")
-  .style("z-index", "150");
+  .attr("text", function(d) { return 0 ? "about" : d; })
+  .attr("left", function(d, i) { return i * 50; })
+  .attr("width", "50px")
+  .attr("top", "300px")
 
 /********* below are for line chart **********/
 d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {

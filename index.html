@@ -67,11 +67,19 @@ var tooltip = d3.select("body")
   .style("max-width", "200px")
   .style("border", "2px solid purple")
   .style("visibility", "visible")
-  .style("z-index", "10");
+  .style("z-index", "150");
 
 // Button
-var button = [1,2,3];
-// d3.select("body").selectAll
+var btn = [1, 2, 3];
+d3.select("body")
+  .selectAll("button")
+  .data(btn)
+  .enter().append("button")
+  .attr("onclick", function(d){ return alert(d); })
+  .style("left", "300px")
+  .style("top", "300px")
+  .text(function(d) { return d; })
+  .style("z-index", "150");
 
 /********* below are for line chart **********/
 d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {

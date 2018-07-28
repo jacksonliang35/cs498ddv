@@ -170,7 +170,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
     // zbar.domain(data.columns.slice(0,4));
 
     g.selectAll(".serie")
-      .data(stack.keys(data.columns.slice(5))(data))
+      .data(stack.keys(data.columns.slice(0,4))(data))
       .enter().append("g")
         .attr("class", "serie")
         .attr("fill", function(d) { return color[d.key]; })

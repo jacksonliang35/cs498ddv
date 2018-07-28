@@ -87,20 +87,19 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       .text("Hours");
 
   // Add path
-  for (var i = 0; i < 2; i++){
+  for (var i = 0; i < vizdata.length; i++){
     g.append("path")
         .attr("stroke", color[vizdata[i][0].PopulationGroup])
         .datum(vizdata[i])
         .attr("class", "line")
         .attr("d", line);
-
-    g.selectAll(".dot")
-        .data(vizdata[i])
-        .enter().append("circle")
-        .attr("class", "dot")
-        .attr("cx", function(d) { return xScale(d.Year) })
-        .attr("cy", function(d) { return yScale(d.Hours) });
   }
+  // g.selectAll(".dot")
+  //     .data(vizdata[i])
+  //     .enter().append("circle")
+  //     .attr("class", "dot")
+  //     .attr("cx", function(d) { return xScale(d.Year) })
+  //     .attr("cy", function(d) { return yScale(d.Hours) });
 });
 
 </script>

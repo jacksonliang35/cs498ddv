@@ -178,7 +178,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       .enter().append("rect")
         .attr("x", function(d) { return xbar(d.data.Year); })
         .attr("y", function(d) { return ybar(d[1]); })
-        .attr("height", function(d) { return y(d[0]) - y(d[1]); })
+        .attr("height", function(d) { return ybar(d[0]) - ybar(d[1]); })
         .attr("width", x.bandwidth());
 
     // g.append("g")

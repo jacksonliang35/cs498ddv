@@ -5,7 +5,7 @@
 }
 .line {
   fill: none;
-  stroke: steelblue;
+  stroke: black;
   stroke-width: 2px;
 }
 </style>
@@ -14,14 +14,17 @@
 <h2>Hello World!</h2>
 <svg id="viz" width="1000" height="500" class="chart"></svg>
 <script>
+// Define color space
+var color = {"Very large": "cyan", "Large": "blue", "Medium": "orange", "Small": "red"};
 
+// Define canvas
 var svg = d3.select("#viz"),
     margin = {top: 40, right: 40, bottom: 40, left: 40},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
     xScale = d3.scaleLinear().range([margin.left, width - margin.right]).domain([1982,2014]),
     yScale = d3.scaleLinear().range([height - margin.top, margin.bottom]).domain([0,90]),
-    // define the line
+    // define the line function
     line = d3.line().x(function(d) { return xScale(d.Year); })
                     .y(function(d) { return yScale(d.Hours); }),
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -79,11 +82,13 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       .text("Hours");
 
   // Add path
-  g.append("path")
-      .data(vizdata)
-      .attr("class", "line")
-      .attr("d", line);
-
+  for (var i = 0; i < 1; i++){
+    g.append("path")
+        .datum(vizdata[i])
+        .attr("class", "line")
+        .attr("d", line)
+        .attr("stroke", color[vizdata[i].PopulationGroup]);
+  }
 });
 
 </script>

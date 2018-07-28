@@ -60,7 +60,7 @@ var tooltip = d3.select("body")
   .text("a simple tooltip");
 
 /********* below are for line chart **********/
-/*
+
 d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
   for (var i = 2; i < columns.length; ++i) d[columns[i]] = +d[columns[i]];
   // d.total = t;
@@ -132,8 +132,6 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       .style("text-anchor", "middle")
       .text("Hours");
 
-
-
   // Add path
   for (var i = 0; i < vizdata.length; i++){
     g.append("path")
@@ -142,6 +140,26 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("class", "line")
         .attr("d", line);
   }
+  // Legend
+  var legend = g.selectAll(".legend")
+    .data(data.columns.slice(0,4))
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  legend.append("rect")
+      .attr("x", width + 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .attr("fill", function(d) { return color[d]; });
+
+  legend.append("text")
+      .attr("x", width + 44)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .attr("text-anchor", "start")
+      .text(function(d) { return d; });
+
   // Dots
   g.selectAll(".dot")
       .data(vizdata2)
@@ -153,10 +171,12 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       .attr("stroke", function(d) { return color[d.PopulationGroup]})
       // Mouse event
       .on("mouseover", function(d){tooltip.text(d.UrbanArea); return tooltip.style("visibility", "visible");})
-      .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+      .on("mouseout", function(){return tooltip.style("visibility", "hidden");})
+      .on("click", display_total);
 });
-*/
-//function display_total(){
+
+/********* below are for bar chart, called by an update function **********/
+function display_total(){
   d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/total_count.csv", function(d, i, columns) {
     for (var i = 0, t = 0; i < columns.length - 1; ++i) t += d[columns[i]] = +d[columns[i]];
     d.total = t;
@@ -200,27 +220,8 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("dy", "0.35em")
         .attr("fill", "#000")
         .text("Hours");
-
-    var legend = g.selectAll(".legend")
-      .data(data.columns.slice(0,4))
-      .enter().append("g")
-        .attr("class", "legend")
-        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-    legend.append("rect")
-        .attr("x", width + 18)
-        .attr("width", 18)
-        .attr("height", 18)
-        .attr("fill", function(d) { return color[d]; });
-
-    legend.append("text")
-        .attr("x", width + 44)
-        .attr("y", 9)
-        .attr("dy", ".35em")
-        .attr("text-anchor", "start")
-        .text(function(d) { return d; });
   });
-//}
+}
 
 
 

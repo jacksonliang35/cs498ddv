@@ -3,6 +3,9 @@
 .axis .domain {
   display: none;
 }
+.text {
+  font: 10px sans-serif
+}
 .line {
   fill: none;
   /* stroke: black; */
@@ -10,6 +13,9 @@
 }
 .dot {
   r: 2;
+}
+.bar {
+  fill: steelblue;
 }
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -22,23 +28,45 @@ var color = {"Very large": "cyan", "Large": "steelblue", "Medium": "orange", "Sm
 
 // Define canvas
 var svg = d3.select("#viz"),
-    margin = {top: 40, right: 40, bottom: 40, left: 40},
+    margin = {top: 40, right: 100, bottom: 40, left: 40},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
-    xScale = d3.scaleLinear().range([margin.left, width - margin.right]).domain([1982,2014]),
-    yScale = d3.scaleLinear().range([height - margin.top, margin.bottom]).domain([0,90]),
-    // define the line function
-    line = d3.line().x(function(d) { return xScale(d.Year); })
-                    .y(function(d) { return yScale(d.Hours); }),
+    xScale = d3.scaleLinear().range([margin.left, svg.attr("width") - margin.right]),
+    yScale = d3.scaleLinear().range([svg.attr("height") - margin.top, margin.bottom]),
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+// Define line function
+var line = d3.line().x(function(d) { return xScale(d.Year); })
+                .y(function(d) { return yScale(d.Hours); });
+// Define bar function
+var xbar = d3.scaleBand()
+      .rangeRound([0, width])
+      .padding(0.3)
+      .align(0.3),
+    ybar = d3.scaleLinear()
+      .rangeRound([height, 0]),
+    zbar = d3.scaleOrdinal(d3.schemeAccent),
+    stack = d3.stack();
 
+// Tooltip
+var tooltip = d3.select("body")
+  .append("div")
+  .style("position", "absolute")
+  .style("z-index", "10")
+  .style("visibility", "hidden")
+  .style("background", "#000")
+  .text("a simple tooltip");
+
+/********* below are for line chart **********/
+/*
 d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
   for (var i = 2; i < columns.length; ++i) d[columns[i]] = +d[columns[i]];
   // d.total = t;
   return d;
 }, function(error, data) {
   if (error) throw error;
+  xScale.domain([1982,2014]);
+  yScale.domain([0,90]);
   // Reformat data
   var vizdata = [],
       vizdata2 = [],
@@ -46,6 +74,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       columns = Object.keys(data[0]),
       ignore_list = ["UrbanArea", "PopulationGroup", "STPercent", "STRank", "LTPercent", "LTRank"];
   for (var i = 0; i < columns.length; i++){
+      var col = columns[i];
       if (!ignore_list.includes(col))
         bar_viz.push({"Year": +col,
                       "Very large": 0,
@@ -101,8 +130,8 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       .style("text-anchor", "middle")
       .text("Hours");
 
-  /********* below are for line chart **********/
-  /*
+
+
   // Add path
   for (var i = 0; i < vizdata.length; i++){
     g.append("path")
@@ -111,14 +140,6 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("class", "line")
         .attr("d", line);
   }
-  // Tooltip
-  var tooltip = d3.select("body")
-    .append("div")
-    .style("position", "absolute")
-    .style("z-index", "10")
-    .style("visibility", "hidden")
-    .style("background", "#000")
-    .text("a simple tooltip");
   // Dots
   g.selectAll(".dot")
       .data(vizdata2)
@@ -131,9 +152,73 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       // Mouse event
       .on("mouseover", function(d){tooltip.text(d.UrbanArea); return tooltip.style("visibility", "visible");})
       .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
-  */
-
 });
+*/
+//function display_total(){
+  d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/total_count.csv", function(d, i, columns) {
+    for (var i = 2, var t = 0; i < columns.length; ++i) t += d[columns[i]] = +d[columns[i]];
+    d.total = t;
+    return d;
+  }, function(error, data) {
+    if (error) throw error;
+
+    console.log(data);
+
+    xbar.domain(data.map(function(d) { return d.Year; }));
+    ybar.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
+    zbar.domain(data.columns.slice(1));
+
+    g.selectAll(".serie")
+      .data(stack.keys(data.columns.slice(1))(data))
+      .enter().append("g")
+        .attr("class", "serie")
+        .attr("fill", function(d) { return zbar(d.key); })
+      .selectAll("rect")
+      .data(function(d) { return d; })
+      .enter().append("rect")
+        .attr("x", function(d) { return xbar(d.data.Year); })
+        .attr("y", function(d) { return ybar(d[1]); })
+        .attr("height", function(d) { return y(d[0]) - y(d[1]); })
+        .attr("width", x.bandwidth());
+
+    // g.append("g")
+    //     .attr("class", "axis axis--x")
+    //     .attr("transform", "translate(0," + height + ")")
+    //     .call(d3.axisBottom(x));
+    //
+    // g.append("g")
+    //     .attr("class", "axis axis--y")
+    //     .call(d3.axisLeft(y).ticks(10, "s"))
+    //   .append("text")
+    //     .attr("x", 2)
+    //     .attr("y", y(y.ticks(10).pop()))
+    //     .attr("dy", "0.35em")
+    //     .attr("text-anchor", "start")
+    //     .attr("fill", "#000")
+    //     .text("Population");
+
+    var legend = g.selectAll(".legend")
+      .data(data.columns.slice(1))
+      .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+    legend.append("rect")
+        .attr("x", width + 18)
+        .attr("width", 18)
+        .attr("height", 18)
+        .attr("fill", z);
+
+    legend.append("text")
+        .attr("x", width + 44)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .attr("text-anchor", "start")
+        .text(function(d) { return d; });
+  });
+//}
+
+
 
 </script>
 </body></html>

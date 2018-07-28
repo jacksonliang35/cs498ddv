@@ -199,7 +199,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .text("Hours");
 
     var legend = g.selectAll(".legend")
-      .data(data.columns.slice(1))
+      .data(data.columns.slice(0,4))
       .enter().append("g")
         .attr("class", "legend")
         .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });

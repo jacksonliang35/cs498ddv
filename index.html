@@ -50,7 +50,7 @@ var svg = d3.select("#viz"),
     y = d3.scaleLinear()
           .rangeRound([height, 0]),
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")"),
-    linechart = g.append("g");
+    linechart = g.append("g").attr("id", "lc");
 
 // Define line function
 var linefunction = d3.line().x(function(d) { return x(d.Year); })
@@ -137,9 +137,9 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("cy", function(d) { return y(d.Hours) })
         .attr("fill", function(d) { return color[d.PopulationGroup]})
         .attr("stroke", function(d) { return color[d.PopulationGroup]});
-    line.append("div")
+    line.selectAll("div")
         .data(vizdata[i])
-        .enter()
+        .enter().append("div")
         .attr("top", function(d) { return x(d.Year) })
         .attr("left", function(d) { return y(d.Hours) })
         .attr("text", function(d) { return d.UrbanArea })
@@ -210,7 +210,10 @@ function display_total(){
 
 /********** function to filter color *********/
 function filter(area){
-  // d3.selectAll()
+  // Find new data
+
+  // Change chart
+  // d3.select("#lc")
 }
 
 </script>

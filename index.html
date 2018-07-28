@@ -169,9 +169,11 @@ function display_total(){
     y.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
 
     // Apply transition
-    var svg = d3.select("svg").transition();
+    // var svg = d3.select("svg").transition();
 
-    svg.selectAll(".serie")
+    g.selectAll(".dot").data([]).exit().remove()
+    .selectAll("path").data([]).exit().remove()
+    .selectAll(".serie")
       .data(stack.keys(data.columns.slice(0,4))(data))
       .enter().append("g")
         .attr("class", "serie")

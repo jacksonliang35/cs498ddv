@@ -59,9 +59,10 @@ var linefunction = d3.line().x(function(d) { return x(d.Year); })
 var stack = d3.stack();
 
 // Tooltip
-var tooltip = d3.select("#lc")
+var tooltip = d3.select("body")
   .append("div")
-  .style("position", "absolute")
+  .style("left", "100px")
+  .style("top", "100px")
   .style("background", "white")
   .style("max-width", "200px")
   .style("border", "2px solid purple")

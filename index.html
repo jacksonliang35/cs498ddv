@@ -68,7 +68,7 @@ var tooltip = d3.select("body")
   .attr("width", "250px")
   .attr("background", "yellow")
   .attr("border", "2px solid purple")
-  .attr("visibility", "visible")
+  .attr("visibility", "visible");
 
 // Button
 var btn = [0, 0, 1, 2, 3];
@@ -80,7 +80,7 @@ d3.select("body")
   .attr("text", function(d) { return 0 ? "about" : d; })
   .attr("left", function(d, i) { return i * 50; })
   .attr("width", "50px")
-  .attr("top", "300px")
+  .attr("top", "300px");
 
 /********* below are for line chart **********/
 d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {

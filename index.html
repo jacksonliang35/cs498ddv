@@ -4,7 +4,8 @@
   display: none;
 }
 .text {
-  font: 10px sans-serif
+  font: 10px sans-serif;
+  text-anchor: middle;
 }
 .line {
   fill: none;
@@ -185,7 +186,10 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
     g.append("g")
         .attr("class", "axis axis--x")
         .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(xbar));
+        .call(d3.axisBottom(xbar))
+     .append("text")
+        .attr("transform", "translate(" + (width/2) + " ," + (height + margin.top + 20) + ")")
+        .text("Year");
 
     g.append("g")
         .attr("class", "axis axis--y")
@@ -194,7 +198,6 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("x", 2)
         .attr("y", ybar(ybar.ticks(10).pop()))
         .attr("dy", "0.35em")
-        .attr("text-anchor", "start")
         .attr("fill", "#000")
         .text("Hours");
 

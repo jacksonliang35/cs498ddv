@@ -208,7 +208,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("x", width + 18)
         .attr("width", 18)
         .attr("height", 18)
-        .attr("fill", function(d) { return color[d.key]; });
+        .attr("fill", function(d) { return color[d]; });
 
     legend.append("text")
         .attr("x", width + 44)

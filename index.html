@@ -80,7 +80,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
 
   // Add path
   g.append("path")
-      .datum(vizdata[0])
+      .data(vizdata)
       .attr("class", "line")
       .attr("d", line);
 

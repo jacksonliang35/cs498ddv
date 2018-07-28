@@ -18,6 +18,13 @@ body { font: 12px Arial;}
 .bar {
   fill: steelblue;
 }
+.div {
+  display: block;
+  background: white;
+  /* margin: auto; */
+  max-width: 200px;
+  border:2px solid purple;
+}
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <html><body>
@@ -40,7 +47,8 @@ var svg = d3.select("#viz"),
           // .align(0.3),
     y = d3.scaleLinear()
           .rangeRound([height, 0]),
-    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")"),
+    linechart = g.append("g");
 
 // Define line function
 var line = d3.line().x(function(d) { return x(d.Year); })
@@ -112,14 +120,31 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       .attr("dy", "1em")
       .text("Hours");
 
-  // Add path
   for (var i = 0; i < vizdata.length; i++){
-    g.append("path")
+    var line = linechart.append("g");
+    // Line
+    line.append("path")
         .attr("stroke", color[vizdata[i][0].PopulationGroup])
         .datum(vizdata[i])
         .attr("class", "line")
         .attr("d", line);
+    // Dots
+    line.selectAll(".dot")
+        .data(vizdata[i])
+        .enter().append("circle")
+        .attr("class", "dot")
+        .attr("cx", function(d) { return x(d.Year) })
+        .attr("cy", function(d) { return y(d.Hours) })
+        .attr("fill", function(d) { return color[d.PopulationGroup]})
+        .attr("stroke", function(d) { return color[d.PopulationGroup]})
+        // Mouse event
+        .on("mouseover", function(d){tooltip.text(d.UrbanArea); return tooltip.style("visibility", "visible");})
+        .on("mouseout", function(){return tooltip.style("visibility", "hidden");})
+        .on("click", display_total);
   }
+
+});
+
   // Legend
   var legend = g.selectAll(".legend")
     .data(labels)
@@ -131,7 +156,8 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       .attr("x", width + 18)
       .attr("width", 18)
       .attr("height", 18)
-      .attr("fill", function(d) { return color[d]; });
+      .attr("fill", function(d) { return color[d]; })
+      .on("click", );
 
   legend.append("text")
       .attr("x", width + 44)
@@ -140,20 +166,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       .attr("text-anchor", "start")
       .text(function(d) { return d; });
 
-  // Dots
-  g.selectAll(".dot")
-      .data(vizdata2)
-      .enter().append("circle")
-      .attr("class", "dot")
-      .attr("cx", function(d) { return x(d.Year) })
-      .attr("cy", function(d) { return y(d.Hours) })
-      .attr("fill", function(d) { return color[d.PopulationGroup]})
-      .attr("stroke", function(d) { return color[d.PopulationGroup]})
-      // Mouse event
-      .on("mouseover", function(d){tooltip.text(d.UrbanArea); return tooltip.style("visibility", "visible");})
-      .on("mouseout", function(){return tooltip.style("visibility", "hidden");})
-      .on("click", display_total);
-});
+
 
 /********* below are for bar chart, called by an update function **********/
 function display_total(){
@@ -171,9 +184,12 @@ function display_total(){
     // Apply transition
     // var svg = d3.select("svg").transition();
 
-    g.selectAll(".dot").data([]).exit().remove()
-    .selectAll("path").data([]).exit().remove()
-    .selectAll(".serie")
+    g.selectAll(".dot").data([]).exit().remove();
+
+    for (var i = 0; i < 101; i++){
+      g.select("path").data([]).exit().remove();
+    }
+    g.selectAll(".serie")
       .data(stack.keys(data.columns.slice(0,4))(data))
       .enter().append("g")
         .attr("class", "serie")
@@ -186,6 +202,11 @@ function display_total(){
         .attr("height", function(d) { return y(d[0]) - y(d[1]); })
         .attr("width", 20);
   });
+}
+
+/********** function to filter color *********/
+function filter(){
+
 }
 
 </script>

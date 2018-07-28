@@ -61,7 +61,13 @@ var stack = d3.stack();
 // Tooltip
 var tooltip = d3.select("body")
   .append("div")
-  .style("position", "absolute");
+  .style("position", "absolute")
+  .style("display", "block")
+  .style("background", "white")
+  .style("max-width", "200px")
+  .style("border", "2px solid purple")
+  .style("visibility", "visible")
+  .style("z-index", "10");
 
 /********* below are for line chart **********/
 d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {

@@ -18,7 +18,7 @@ body { font: 12px Arial;}
 .bar {
   fill: steelblue;
 }
-.div {
+div {
   display: block;
   background: white;
   /* margin: auto; */
@@ -61,10 +61,12 @@ var stack = d3.stack();
 // Tooltip
 var tooltip = d3.select("body")
   .append("div")
+  .attr("class", "tooltip")
   .style("left", "100px")
   .style("top", "500px")
+  .style("height", "250px")
+  .style("width", "250px")
   .style("background", "yellow")
-  .style("max-width", "200px")
   .style("border", "2px solid purple")
   .style("visibility", "visible")
   .style("z-index", "150");
@@ -156,8 +158,10 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("fill", function(d) { return color[d.PopulationGroup]})
         .attr("stroke", function(d) { return color[d.PopulationGroup]})
         // Mouse event
-        .on("mouseover", function(d){ tooltip.style("text", d.UrbanArea); return tooltip.style("visibility", "visible"); })
-        .on("mouseout", function(){ return tooltip.style("visibility", "hidden"); })
+        // .on("mouseover", function(d){ tooltip.style("text", d.UrbanArea); return tooltip.style("visibility", "visible"); })
+        // .on("mouseout", function(){ return tooltip.style("visibility", "hidden"); })
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
         .on("click", display_total);
   }
 
@@ -227,6 +231,33 @@ function filter(area, data){
   d3.select("#lc")
     .selectAll("g").attr("visibility", "hidden")
     .selectAll("[color=" + color[area] + "]").attr("visibility", "visible")
+}
+
+/******** functions to handle mouse **********/
+function handleMouseOver(d, i){
+    // Use D3 to select element, change size
+    d3.select(this).attr({
+      r: radius * 2
+    });
+
+    // Specify where to put label of text
+    svg.append("text").attr({
+       id: "t" + d.UrbanArea + "-" + d.Year + "-" + i,
+        x: function() { return x(d.Year) - 30; },
+        y: function() { return y(d.Hours) - 15; }
+    })
+    .text(function() {
+      return [d.UrbanArea, d.Hours];
+    });
+  }
+
+function handleMouseOut(d, i) {
+    d3.select(this).attr({
+      r: radius
+    });
+
+    // Select text by id and then remove
+    d3.select("#t" + d.UrbanArea + "-" + d.Year + "-" + i).remove();
 }
 
 </script>

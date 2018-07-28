@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <style> /* set the CSS */
+body { font: 12px Arial;}
 .axis .domain {
-  display: none;
+  /*display: none;*/
 }
 .text {
-  font: 10px sans-serif;
   text-anchor: middle;
 }
 .line {
@@ -22,33 +22,30 @@
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <html><body>
 <h2>Hello World!</h2>
-<svg id="viz" width="800" height="500" class="chart"></svg>
+<svg id="viz" width="1000" height="500" class="chart"></svg>
 <script>
-// Define color space
-var color = {"Very large": "cyan", "Large": "steelblue", "Medium": "orange", "Small": "red"};
+// Define color space and legend
+var color = {"Very large": "cyan", "Large": "steelblue", "Medium": "orange", "Small": "red"},
+    legend = ["Very large", "Large", "Medium", "Small"];
 
 // Define canvas
 var svg = d3.select("#viz"),
-    margin = {top: 40, right: 100, bottom: 40, left: 40},
+    margin = {top: 40, right: 200, bottom: 40, left: 40},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
-    xScale = d3.scaleLinear().range([margin.left, svg.attr("width") - margin.right]),
-    yScale = d3.scaleLinear().range([svg.attr("height") - margin.top, margin.bottom]),
+    x = d3.scaleBand()
+          .rangeRound([0, width])
+          .padding(0.3)
+          .align(0.3),
+    y = d3.scaleLinear()
+          .rangeRound([height, 0]),
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 // Define line function
-var line = d3.line().x(function(d) { return xScale(d.Year); })
-                .y(function(d) { return yScale(d.Hours); });
+var line = d3.line().x(function(d) { return x(d.Year); })
+                    .y(function(d) { return y(d.Hours); });
 // Define bar function
-var xbar = d3.scaleBand()
-      .rangeRound([0, width])
-      .padding(0.3)
-      .align(0.3),
-    ybar = d3.scaleLinear()
-      .rangeRound([height, 0]),
-    // zbar = d3.scaleOrdinal()
-    //   .range(['cyan', 'steelblue', 'orange', 'red']),
-    stack = d3.stack();
+var stack = d3.stack();
 
 // Tooltip
 var tooltip = d3.select("body")
@@ -60,31 +57,19 @@ var tooltip = d3.select("body")
   .text("a simple tooltip");
 
 /********* below are for line chart **********/
-
 d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
   for (var i = 2; i < columns.length; ++i) d[columns[i]] = +d[columns[i]];
-  // d.total = t;
   return d;
 }, function(error, data) {
   if (error) throw error;
-  xScale.domain([1982,2014]);
-  yScale.domain([0,90]);
+  // Get axes range
+  x.domain([1982,2014]);
+  y.domain([0,90]);
   // Reformat data
   var vizdata = [],
       vizdata2 = [],
-      bar_viz = [],
       columns = Object.keys(data[0]),
       ignore_list = ["UrbanArea", "PopulationGroup", "STPercent", "STRank", "LTPercent", "LTRank"];
-  for (var i = 0; i < columns.length; i++){
-      var col = columns[i];
-      if (!ignore_list.includes(col))
-        bar_viz.push({"Year": +col,
-                      "Very large": 0,
-                      "Large": 0,
-                      "Medium": 0,
-                      "Small": 0});
-  }
-
 
   for (var i = 0; i < data.length; i++){
     var temp = [];
@@ -99,37 +84,30 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
                    "PopulationGroup": data[i].PopulationGroup,
                    "Hours": +data[i][col],
                    "Year": +col});
-        bar_viz[data[i].PopulationGroup] += +data[i][col];
       }
     }
     vizdata.push(temp);
   }
-  console.log(bar_viz);
 
   // Add x axis
   g.append("g")
+      .attr("class", "axis axis--x")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(xScale));
-
-  // text label for the x axis
-  g.append("text")
-      .attr("transform",
-            "translate(" + (width/2) + " ," +
-                           (height + margin.top + 20) + ")")
-      .style("text-anchor", "middle")
+      .call(d3.axisBottom(x).ticks(10, "s"))
+   .append("text")
+      .attr("transform", "translate(" + (width/2) + " ," + (height + margin.top + 20) + ")")
       .text("Year");
 
-  // Add the y Axis
-  g.append("g")
-      .call(d3.axisLeft(yScale));
 
-  // text label for the y axis
-  g.append("text")
+  // Add y Axis
+  g.append("g")
+      .attr("class", "axis axis--y")
+      .call(d3.axisLeft(y))
+   .append("text")
       .attr("transform", "rotate(-90)")
       .attr("y", 0 - margin.left)
       .attr("x",0 - (height / 2))
       .attr("dy", "1em")
-      .style("text-anchor", "middle")
       .text("Hours");
 
   // Add path
@@ -142,7 +120,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
   }
   // Legend
   var legend = g.selectAll(".legend")
-    .data(data.columns.slice(0,4))
+    .data(legend)
     .enter().append("g")
       .attr("class", "legend")
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
@@ -165,8 +143,8 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       .data(vizdata2)
       .enter().append("circle")
       .attr("class", "dot")
-      .attr("cx", function(d) { return xScale(d.Year) })
-      .attr("cy", function(d) { return yScale(d.Hours) })
+      .attr("cx", function(d) { return x(d.Year) })
+      .attr("cy", function(d) { return y(d.Hours) })
       .attr("fill", function(d) { return color[d.PopulationGroup]})
       .attr("stroke", function(d) { return color[d.PopulationGroup]})
       // Mouse event
@@ -188,7 +166,9 @@ function display_total(){
 
     xbar.domain(data.map(function(d) { return d.Year; }));
     ybar.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
-    // zbar.domain(data.columns.slice(0,4));
+
+    // Apply transition
+    var g = d3.select("svg:g").transition();
 
     g.selectAll(".serie")
       .data(stack.keys(data.columns.slice(0,4))(data))
@@ -222,8 +202,6 @@ function display_total(){
         .text("Hours");
   });
 }
-
-
 
 </script>
 </body></html>

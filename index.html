@@ -40,10 +40,21 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
 }, function(error, data) {
   if (error) throw error;
   // Reformat data
-  var vizdata = [];
-  var vizdata2 = [];
-  var columns = Object.keys(data[0]);
-  var ignore_list = ["UrbanArea", "PopulationGroup", "STPercent", "STRank", "LTPercent", "LTRank"];
+  var vizdata = [],
+      vizdata2 = [],
+      bar_viz = [],
+      columns = Object.keys(data[0]),
+      ignore_list = ["UrbanArea", "PopulationGroup", "STPercent", "STRank", "LTPercent", "LTRank"];
+  for (var i = 0; i < columns.length; i++){
+      if (!ignore_list.includes(col))
+        bar_viz.push({"Year": +col,
+                      "Very large": 0,
+                      "Large": 0,
+                      "Medium": 0,
+                      "Small": 0});
+  }
+
+
   for (var i = 0; i < data.length; i++){
     var temp = [];
     for (var j = 0; j < columns.length; j++){
@@ -57,11 +68,12 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
                    "PopulationGroup": data[i].PopulationGroup,
                    "Hours": +data[i][col],
                    "Year": +col});
+        bar_viz[data[i].PopulationGroup] += +data[i][col];
       }
     }
     vizdata.push(temp);
   }
-  console.log(color[vizdata[0][0].PopulationGroup]);
+  console.log(bar_viz);
 
   // Add x axis
   g.append("g")
@@ -89,6 +101,8 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       .style("text-anchor", "middle")
       .text("Hours");
 
+  /********* below are for line chart **********/
+  /*
   // Add path
   for (var i = 0; i < vizdata.length; i++){
     g.append("path")
@@ -117,7 +131,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
       // Mouse event
       .on("mouseover", function(d){tooltip.text(d.UrbanArea); return tooltip.style("visibility", "visible");})
       .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
-
+  */
 
 });
 

@@ -45,7 +45,7 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         temp.push({"UrbanArea": data[i].UrbanArea,
                    "PopulationGroup": data[i].PopulationGroup,
                    "Hours": data[i][col],
-                   "Year": [col]});
+                   "Year": +col});
       }
     }
     vizdata.push(temp);

@@ -64,7 +64,7 @@ var tooltip = d3.select("body")
   .attr("class", "tooltip")
   .style("left", "100px")
   .style("top", "500px")
-  .style("height", "250px")
+  .style("height", "50px")
   .style("width", "250px")
   .style("background", "yellow")
   .style("border", "2px solid purple")
@@ -72,14 +72,15 @@ var tooltip = d3.select("body")
   .style("z-index", "150");
 
 // Button
-var btn = [0, 1, 2, 3];
+var btn = [0, 0, 1, 2, 3];
 d3.select("body")
   .selectAll("div")
   .data(btn)
   .enter().append("div")
   .on("click", function(d){ return alert(d); })
   .style("text", function(d) { return 0 ? "about" : d; })
-  .style("left", "300px")
+  .style("left", function(d, i) { return i * 50; })
+  .style("width", "50px")
   .style("top", "300px")
   .style("z-index", "150");
 
@@ -158,10 +159,10 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("fill", function(d) { return color[d.PopulationGroup]})
         .attr("stroke", function(d) { return color[d.PopulationGroup]})
         // Mouse event
-        // .on("mouseover", function(d){ tooltip.style("text", d.UrbanArea); return tooltip.style("visibility", "visible"); })
-        // .on("mouseout", function(){ return tooltip.style("visibility", "hidden"); })
-        .on("mouseover", handleMouseOver)
-        .on("mouseout", handleMouseOut)
+        .on("mouseover", function(d){ tooltip.style("text", d.UrbanArea); return tooltip.style("visibility", "visible"); })
+        .on("mouseout", function(){ return tooltip.style("visibility", "hidden"); })
+        // .on("mouseover", handleMouseOver)
+        // .on("mouseout", handleMouseOut)
         .on("click", display_total);
   }
 

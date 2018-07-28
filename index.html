@@ -138,6 +138,8 @@ d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs
         .attr("fill", function(d) { return color[d.PopulationGroup]})
         .attr("stroke", function(d) { return color[d.PopulationGroup]});
     line.append("div")
+        .data(vizdata[i])
+        .enter()
         .attr("top", function(d) { return x(d.Year) })
         .attr("left", function(d) { return y(d.Hours) })
         .attr("text", function(d) { return d.UrbanArea })
@@ -207,8 +209,8 @@ function display_total(){
 }
 
 /********** function to filter color *********/
-function filter(){
-
+function filter(area){
+  // d3.selectAll()
 }
 
 </script>

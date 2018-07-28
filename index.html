@@ -33,10 +33,10 @@ var svg = d3.select("#viz"),
     margin = {top: 40, right: 200, bottom: 40, left: 40},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
-    x = d3.scaleBand()
-          .rangeRound([0, width])
-          .padding(0.3)
-          .align(0.3),
+    x = d3.scaleLinear()
+          .rangeRound([0, width]),
+          // .padding(0.3)
+          // .align(0.3),
     y = d3.scaleLinear()
           .rangeRound([height, 0]),
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");

@@ -30,13 +30,19 @@ div {
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <html><body>
 <h2 id="hd"></h2>
-<p id="desc"></p>
+<p id="p1"></p>
+<p id="p2"></p>
+<p id="p3"></p>
+<p id="p4"></p>
+<h3>Click on the legend rectangle for more!</h3>
 <svg id="viz" width="1000" height="500" class="chart"></svg>
 <script>
 // About Passage
-var passage = "
+var passage1 = "This visualization follows the pattern of an interactive slideshow. The purpose of the presentation is to show a smoother increase in congestion-hours in recent years. Hence, the scenes are displayed in the following order. In the first scene, part of the total data is displayed for previous year's tremendous increase. As the viewer might guess that the later years would still increase as previously, in the second scene, the whole data is displayed to show the smooth effect in recent years. In the third scene, an overview of the total number of delay is displayed, so that the viewer can get a complete picture of not only individual but also total data. Transitions are used in-between.",
+    passage2 = "The visualization also includes annotations. All labeling annotations follow the same visual pattern, with a yellow background, to arouse attention, and black text. The annotations are located at the same place so that the viewer might not need to find around the label and get distracted. A legend is also included to display the color correspondence of each sized city. It has a built-in filter, which will be discussed later.",
+    passage3 = "Parameters are also available in the visualization. At the bottom left corner, there are 5 buttons to control the slides to go forward or jump to a preferred slide. The total progress is displayed, and the current state is also displayed so that the view can see which slide it is in and how much he/she has been so far.",
+    passage4 = "Finally, triggers are available in two ways. The first way is for the user to change the slide. If the viewer wants to go back to check a previous slide, he/she can simply click on the desired slide number and jump to it, where the slide number would be a good reference in this case. In the second way, the legend has a built-in filter (for the line charts) to display only data of the same category, in this case color. The line chart, putting everything on the chart, is a little bit messy, and a filter would greatly help the viewer to see the relevant data.";
 
-"
 // FSM
 var cur_state = 0,
     filter_state = "all";
@@ -86,16 +92,21 @@ d3.select("body").append("g").attr("id", "btn")
   .enter().append("div")
   // .attr("left", function(d, i) { return i * 50; })
   .attr("transform", function(d) { return "translate("+ d * 50 + ",50)"; } )
-  .attr("text-anchor", "middle")
+  .style("text-align", "center")
   .attr("id", function(d) { return "b" + d; } )
   .style("border", "2px solid purple")
-  .style("width", "35px")
+  .style("width", "75px")
   // .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
   .on("click", function(d){ if (d === 1) return display_first();
                             else if (d === 2) return display_second();
                             else if (d === 3) return display_total();
                             else if (d === 4) return display_next(cur_state);
-                            else return alert(passage);
+                            else{
+                              d3.select("#p1").text(passage1);
+                              d3.select("#p2").text(passage2);
+                              d3.select("#p3").text(passage3);
+                              d3.select("#p4").text(passage4);
+                            };
                           })
   .text(function(d) { if (d === 0) return "About the Visulization";
                       else if (d === 4) return "Next Slide";
@@ -110,6 +121,7 @@ d3.select("body").append("g").attr("id", "btn")
       .call(d3.axisBottom(x).ticks(20, "s").tickFormat(d3.format("")));
   g.append("text")
       .attr("transform", "translate(" + (width/2) + " ," + (height + margin.top) + ")")
+      .attr("text-anchor", "middle")
       .text("Year");
 
 
@@ -122,6 +134,7 @@ d3.select("body").append("g").attr("id", "btn")
       .attr("y", 0 - margin.left)
       .attr("x",0 - (height / 2))
       .attr("dy", "1em")
+      .attr("text-anchor", "middle")
       .text("Annual Highway Traffic Delay (in person-hour)");
 
   // Legend
@@ -156,7 +169,7 @@ function display_first(){
   d3.select("#b3").style("background", "white");
   // Write description
   d3.select("#hd").text("Annual Person-Hours of Highway Traffic Delay Per Auto Commuter in 101 Sampled City from 1982 to 2014");
-  d3.select("#desc").text("This is the 1st chart!");
+  // d3.select("#desc").text("This is the 1st chart!");
   // Read data
   d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
     for (var i = 2; i < columns.length; ++i) d[columns[i]] = +d[columns[i]];
@@ -230,8 +243,8 @@ function display_second(){
   d3.select("#b2").style("background", "purple");
   d3.select("#b3").style("background", "white");
   // Write header and description
-  d3.select("#hd").text("Annual Person-Hours of Highway Traffic Delay Per Auto Commuter in 101 Sampled City from 1982 to 2008");
-  d3.select("#desc").text("This is the 2nd chart!");
+  d3.select("#hd").text("Annual Person-Hours of Highway Traffic Delay Per Auto Commuter in 101 Sampled City from 1982 to 2014");
+  // d3.select("#desc").text("This is the 2nd chart!");
   // Read data
   d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
     for (var i = 2; i < columns.length; ++i) d[columns[i]] = +d[columns[i]];
@@ -306,7 +319,8 @@ function display_total(){
   tooltip.style("visibility", "hidden");
   // Write header and description
   d3.select("#hd").text("Annual Person-Hours of Highway Traffic Delay Per Auto Commuter for Different Sized Cities from 1982 to 2014")
-  d3.select("#desc").text("This is the 3rd chart!");
+  // d3.select("#desc").text("This is the 3rd chart!");
+  // Read data
   d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/total_count.csv", function(d, i, columns) {
     for (var i = 0, t = 0; i < columns.length - 1; ++i) t += d[columns[i]] = +d[columns[i]];
     d.total = t;
@@ -345,6 +359,7 @@ function display_total(){
 function display_next(state){
   if (state === 1) display_second();
   else if (state === 2) display_total();
+  else if (state === 3) display_first();
 }
 
 /********** function to filter color *********/

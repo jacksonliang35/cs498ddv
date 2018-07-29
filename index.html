@@ -29,10 +29,14 @@ div {
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <html><body>
-<h2 id="hd">Hello World!</h2>
+<h2 id="hd"></h2>
 <p id="desc"></p>
 <svg id="viz" width="1000" height="500" class="chart"></svg>
 <script>
+// About Passage
+var passage = "
+
+"
 // FSM
 var cur_state = 0,
     filter_state = "all";
@@ -91,10 +95,10 @@ d3.select("body").append("g").attr("id", "btn")
                             else if (d === 2) return display_second();
                             else if (d === 3) return display_total();
                             else if (d === 4) return display_next(cur_state);
-                            else return alert("About Page");
+                            else return alert(passage);
                           })
-  .text(function(d) { if (d === 0) return "About";
-                      else if (d === 4) return "Next";
+  .text(function(d) { if (d === 0) return "About the Visulization";
+                      else if (d === 4) return "Next Slide";
                       else return d;
                     });
 
@@ -118,7 +122,7 @@ d3.select("body").append("g").attr("id", "btn")
       .attr("y", 0 - margin.left)
       .attr("x",0 - (height / 2))
       .attr("dy", "1em")
-      .text("Hours");
+      .text("Annual Highway Traffic Delay (in person-hour)");
 
   // Legend
   var legend = g.selectAll(".legend")
@@ -141,7 +145,7 @@ d3.select("body").append("g").attr("id", "btn")
       .attr("text-anchor", "start")
       .text(function(d) { return d; });
 
-display_first()
+display_first();
 
 function display_first(){
   // For state control
@@ -151,6 +155,7 @@ function display_first(){
   d3.select("#b2").style("background", "white");
   d3.select("#b3").style("background", "white");
   // Write description
+  d3.select("#hd").text("Annual Person-Hours of Highway Traffic Delay Per Auto Commuter in 101 Sampled City from 1982 to 2014");
   d3.select("#desc").text("This is the 1st chart!");
   // Read data
   d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
@@ -169,7 +174,6 @@ function display_first(){
 
     // Reformat data
     var vizdata = [],
-        // vizdata2 = [],
         columns = Object.keys(data[0]),
         ignore_list = ["UrbanArea", "PopulationGroup", "STPercent", "STRank", "LTPercent", "LTRank"];
 
@@ -182,10 +186,6 @@ function display_first(){
                      "PopulationGroup": data[i].PopulationGroup,
                      "Hours": +data[i][col],
                      "Year": +col});
-          // vizdata2.push({"UrbanArea": data[i].UrbanArea,
-          //            "PopulationGroup": data[i].PopulationGroup,
-          //            "Hours": +data[i][col],
-          //            "Year": +col});
         }
       }
       vizdata.push(temp);
@@ -229,7 +229,8 @@ function display_second(){
   d3.select("#b1").style("background", "white");
   d3.select("#b2").style("background", "purple");
   d3.select("#b3").style("background", "white");
-  // Write description
+  // Write header and description
+  d3.select("#hd").text("Annual Person-Hours of Highway Traffic Delay Per Auto Commuter in 101 Sampled City from 1982 to 2008");
   d3.select("#desc").text("This is the 2nd chart!");
   // Read data
   d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
@@ -248,7 +249,6 @@ function display_second(){
 
     // Reformat data
     var vizdata = [],
-        vizdata2 = [],
         columns = Object.keys(data[0]),
         ignore_list = ["UrbanArea", "PopulationGroup", "STPercent", "STRank", "LTPercent", "LTRank"];
 
@@ -261,10 +261,6 @@ function display_second(){
                      "PopulationGroup": data[i].PopulationGroup,
                      "Hours": +data[i][col],
                      "Year": +col});
-          // vizdata2.push({"UrbanArea": data[i].UrbanArea,
-          //            "PopulationGroup": data[i].PopulationGroup,
-          //            "Hours": +data[i][col],
-          //            "Year": +col});
         }
       }
       vizdata.push(temp);
@@ -295,13 +291,8 @@ function display_second(){
                                         return tooltip.style("visibility", "visible"); })
           .on("mouseout", function(){ return tooltip.style("visibility", "hidden"); })
     }
-
   });
-
-
 }
-
-
 
 /********* below are for bar chart, called by an update function **********/
 function display_total(){
@@ -313,7 +304,8 @@ function display_total(){
   d3.select("#b3").style("background", "purple");
   // Close opened tooltip
   tooltip.style("visibility", "hidden");
-  // Write description
+  // Write header and description
+  d3.select("#hd").text("Annual Person-Hours of Highway Traffic Delay Per Auto Commuter for Different Sized Cities from 1982 to 2014")
   d3.select("#desc").text("This is the 3rd chart!");
   d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/total_count.csv", function(d, i, columns) {
     for (var i = 0, t = 0; i < columns.length - 1; ++i) t += d[columns[i]] = +d[columns[i]];
@@ -322,16 +314,11 @@ function display_total(){
   }, function(error, data) {
     if (error) throw error;
 
-    // console.log(data);
     // Change y axis domain
     y.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
     d3.select("#yaxis").transition().duration(750).call(d3.axisLeft(y).tickFormat(d3.format("")));
+    // Remove previous chart
     linechart.selectAll("*").remove();
-
-
-    // Apply transition
-    // var svg = d3.select("svg").transition();
-
 
     barchart.selectAll(".serie")
       .data(stack.keys(data.columns.slice(0,4))(data))

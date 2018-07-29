@@ -23,16 +23,18 @@ div {
   background: white;
   /* margin: auto; */
   max-width: 200px;
-  border:2px solid purple;
   visibility: visible;
   z-index: 10;
 }
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <html><body>
-<h2>Hello World!</h2>
+<h2 id="hd">Hello World!</h2>
 <svg id="viz" width="1000" height="500" class="chart"></svg>
 <script>
+// FSM
+var cur_state = 0;
+
 // Define color space and legend
 var color = {"Very large": "cyan", "Large": "steelblue", "Medium": "orange", "Small": "red"},
     labels = ["Very large", "Large", "Medium", "Small"];
@@ -65,134 +67,154 @@ var tooltip = d3.select("body")
   .attr("left", "100px")
   .attr("top", "500px")
   .attr("height", "50px")
-  .attr("width", "250px")
-  .attr("background", "yellow")
-  .attr("border", "2px solid purple")
-  .attr("visibility", "visible");
+  .style("width", "250px")
+  .style("background", "yellow")
+  .style("visibility", "hidden");
 
 // Button
-var btn = [0, 0, 1, 2, 3];
-d3.select("body")
+var btn = [0, 1, 2, 3];
+d3.select("body").append("g").attr("id", "btn")
   .selectAll("div")
   .data(btn)
   .enter().append("div")
-  .on("click", function(d){ return alert(d); })
-  .attr("left", function(d, i) { return i * 50; })
-  .attr("width", "50px")
-  .attr("top", "300px")
-  .text(function(d) { return 0 ? "about" : d; });
+  // .attr("left", function(d, i) { return i * 50; })
+  .attr("transform", function(d) { return "translate("+ d * 50 + ",50)"; } )
+  .attr("text-anchor", "middle")
+  .attr("id", function(d) { return "b" + d; } )
+  .style("border", "2px solid purple")
+  .style("width", "35px")
+  // .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+  .on("click", function(d){ if (d === 1) return alert(d);
+                            else if (d === 2) return display_first();
+                            else if (d === 3) return display_total();
+                            else return alert("About Page");
+                          })
+  .text(function(d) { if (d === 0) return "About"; else return d; });
+
+display_first()
 
 /********* below are for line chart **********/
-d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
-  for (var i = 2; i < columns.length; ++i) d[columns[i]] = +d[columns[i]];
-  return d;
-}, function(error, data) {
-  if (error) throw error;
+function display_first(){
+  if (cur_state === 1) return;
+  cur_state = 1;
+  d3.select("#b1").style("background", "purple");
+  d3.select("#b2").style("background", "white");
+  d3.select("#b3").style("background", "white");
+  d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
+    for (var i = 2; i < columns.length; ++i) d[columns[i]] = +d[columns[i]];
+    return d;
+  }, function(error, data) {
+    if (error) throw error;
 
-  // Get y axis range
-  y.domain([0,90]);
+    // Get y axis range
+    y.domain([0,90]);
 
-  // Reformat data
-  var vizdata = [],
-      vizdata2 = [],
-      columns = Object.keys(data[0]),
-      ignore_list = ["UrbanArea", "PopulationGroup", "STPercent", "STRank", "LTPercent", "LTRank"];
+    // Reformat data
+    var vizdata = [],
+        vizdata2 = [],
+        columns = Object.keys(data[0]),
+        ignore_list = ["UrbanArea", "PopulationGroup", "STPercent", "STRank", "LTPercent", "LTRank"];
 
-  for (var i = 0; i < data.length; i++){
-    var temp = [];
-    for (var j = 0; j < columns.length; j++){
-      var col = columns[j];
-      if(!ignore_list.includes(col)){
-        temp.push({"UrbanArea": data[i].UrbanArea,
-                   "PopulationGroup": data[i].PopulationGroup,
-                   "Hours": +data[i][col],
-                   "Year": +col});
-        // vizdata2.push({"UrbanArea": data[i].UrbanArea,
-        //            "PopulationGroup": data[i].PopulationGroup,
-        //            "Hours": +data[i][col],
-        //            "Year": +col});
+    for (var i = 0; i < data.length; i++){
+      var temp = [];
+      for (var j = 0; j < columns.length; j++){
+        var col = columns[j];
+        if(!ignore_list.includes(col)){
+          temp.push({"UrbanArea": data[i].UrbanArea,
+                     "PopulationGroup": data[i].PopulationGroup,
+                     "Hours": +data[i][col],
+                     "Year": +col});
+          // vizdata2.push({"UrbanArea": data[i].UrbanArea,
+          //            "PopulationGroup": data[i].PopulationGroup,
+          //            "Hours": +data[i][col],
+          //            "Year": +col});
+        }
       }
+      vizdata.push(temp);
     }
-    vizdata.push(temp);
-  }
 
-  // Add x axis
-  g.append("g")
-      .attr("class", "axis axis--x")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x).ticks(20, "s").tickFormat(d3.format("")));
-  g.append("text")
-      .attr("transform", "translate(" + (width/2) + " ," + (height + margin.top) + ")")
-      .text("Year");
+    // Add x axis
+    g.append("g")
+        .attr("class", "axis axis--x")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x).ticks(20, "s").tickFormat(d3.format("")));
+    g.append("text")
+        .attr("transform", "translate(" + (width/2) + " ," + (height + margin.top) + ")")
+        .text("Year");
 
 
-  // Add y Axis
-  g.append("g")
-      .attr("class", "axis axis--y")
-      .call(d3.axisLeft(y).tickFormat(d3.format("")));
-  g.append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 0 - margin.left)
-      .attr("x",0 - (height / 2))
-      .attr("dy", "1em")
-      .text("Hours");
+    // Add y Axis
+    g.append("g")
+        .attr("class", "axis axis--y")
+        .call(d3.axisLeft(y).tickFormat(d3.format("")));
+    g.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - margin.left)
+        .attr("x",0 - (height / 2))
+        .attr("dy", "1em")
+        .text("Hours");
 
-  for (var i = 0; i < vizdata.length; i++){
-    var line = linechart.append("g")
-                        .attr("id", i);
-    // Line
-    line.append("path")
-        .attr("stroke", color[vizdata[i][0].PopulationGroup])
-        .datum(vizdata[i])
-        .attr("class", "line")
-        .attr("d", linefunction);
-    // Dots
-    line.selectAll(".dot")
-        .data(vizdata[i])
-        .enter()
-        .append("circle")
-        .attr("class", "dot")
-        .attr("cx", function(d) { return x(d.Year) })
-        .attr("cy", function(d) { return y(d.Hours) })
-        .attr("fill", function(d) { return color[d.PopulationGroup]})
-        .attr("stroke", function(d) { return color[d.PopulationGroup]})
-        // Mouse event
-        .on("mouseover", function(d){ tooltip.text(d.UrbanArea); return tooltip.style("visibility", "visible"); })
-        .on("mouseout", function(){ return tooltip.style("visibility", "hidden"); })
-        // .on("mouseover", handleMouseOver)
-        // .on("mouseout", handleMouseOut)
-        .on("click", display_total);
-  }
+    for (var i = 0; i < vizdata.length; i++){
+      var line = linechart.append("g")
+                          .attr("id", "ln"+i)
+                          .attr("city", vizdata[i][0].PopulationGroup);
+      // Line
+      line.append("path")
+          .attr("stroke", color[vizdata[i][0].PopulationGroup])
+          .datum(vizdata[i])
+          .attr("class", "line")
+          .attr("d", linefunction);
+      // Dots
+      line.selectAll(".dot")
+          .data(vizdata[i])
+          .enter()
+          .append("circle")
+          .attr("class", "dot")
+          .attr("cx", function(d) { return x(d.Year) })
+          .attr("cy", function(d) { return y(d.Hours) })
+          .attr("fill", function(d) { return color[d.PopulationGroup]})
+          .attr("stroke", function(d) { return color[d.PopulationGroup]})
+          // Mouse event
+          .on("mouseover", function(d){ tooltip.text(d.UrbanArea + " \n " + d.Hours); return tooltip.style("visibility", "visible"); })
+          .on("mouseout", function(){ return tooltip.style("visibility", "hidden"); })
+          .on("click", display_total);
+    }
 
-});
+  });
 
-  // Legend
-  var legend = g.selectAll(".legend")
-    .data(labels)
-    .enter().append("g")
-      .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+    // Legend
+    var legend = g.selectAll(".legend")
+      .data(labels)
+      .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
-  legend.append("rect")
-      .attr("x", width + 18)
-      .attr("width", 18)
-      .attr("height", 18)
-      .attr("fill", function(d) { return color[d]; })
-      .on("click", filter);
+    legend.append("rect")
+        .attr("x", width + 18)
+        .attr("width", 18)
+        .attr("height", 18)
+        .attr("fill", function(d) { return color[d]; })
+        .on("click", function(d) { return filter(d); });
 
-  legend.append("text")
-      .attr("x", width + 44)
-      .attr("y", 9)
-      .attr("dy", ".35em")
-      .attr("text-anchor", "start")
-      .text(function(d) { return d; });
+    legend.append("text")
+        .attr("x", width + 44)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .attr("text-anchor", "start")
+        .text(function(d) { return d; });
+}
 
 
 
 /********* below are for bar chart, called by an update function **********/
 function display_total(){
+  if (cur_state === 3) return;
+  cur_state = 3;
+  d3.select("#b1").style("background", "white");
+  d3.select("#b2").style("background", "white");
+  d3.select("#b3").style("background", "purple");
   // Close tooltip
-  tooltip.style("visibility", "hidden")
+  tooltip.style("visibility", "hidden");
   d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/total_count.csv", function(d, i, columns) {
     for (var i = 0, t = 0; i < columns.length - 1; ++i) t += d[columns[i]] = +d[columns[i]];
     d.total = t;
@@ -226,37 +248,11 @@ function display_total(){
 }
 
 /********** function to filter color *********/
-function filter(area, data){
+function filter(area){
   d3.select("#lc")
-    .selectAll("g").attr("visibility", "hidden")
-    .selectAll("[color=" + color[area] + "]").attr("visibility", "visible")
-}
-
-/******** functions to handle mouse **********/
-function handleMouseOver(d, i){
-    // Use D3 to select element, change size
-    d3.select(this).attr({
-      r: 6
-    });
-
-    // Specify where to put label of text
-    svg.append("text").attr({
-       id: "t" + d.UrbanArea + "-" + d.Year + "-" + i,
-        x: function() { return x(d.Year) - 30; },
-        y: function() { return y(d.Hours) - 15; }
-    })
-    .text(function() {
-      return [d.UrbanArea, d.Hours];
-    });
-  }
-
-function handleMouseOut(d, i) {
-    d3.select(this).attr({
-      r: 2
-    });
-
-    // Select text by id and then remove
-    d3.select("#t" + d.UrbanArea + "-" + d.Year + "-" + i).remove();
+    .selectAll("g").attr("visibility", "hidden");
+  d3.select("#lc")
+    .selectAll("g[city='" + area + "']").attr("visibility", "visible");
 }
 
 </script>

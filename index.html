@@ -33,7 +33,8 @@ div {
 <svg id="viz" width="1000" height="500" class="chart"></svg>
 <script>
 // FSM
-var cur_state = 0;
+var cur_state = 0,
+    filter_state = "all";
 
 // Define color space and legend
 var color = {"Very large": "cyan", "Large": "steelblue", "Medium": "orange", "Small": "red"},
@@ -64,8 +65,8 @@ var stack = d3.stack();
 var tooltip = d3.select("body")
   .append("div")
   .attr("class", "tooltip")
-  .attr("left", "100px")
-  .attr("top", "500px")
+  .attr("x", "100px")
+  .attr("y", "300px")
   .attr("height", "50px")
   .style("width", "250px")
   .style("background", "yellow")
@@ -177,7 +178,6 @@ function display_first(){
           // Mouse event
           .on("mouseover", function(d){ tooltip.text(d.UrbanArea + " \n " + d.Hours); return tooltip.style("visibility", "visible"); })
           .on("mouseout", function(){ return tooltip.style("visibility", "hidden"); })
-          .on("click", display_total);
     }
 
   });
@@ -249,10 +249,19 @@ function display_total(){
 
 /********** function to filter color *********/
 function filter(area){
+  if (filter_state === area) {
+    // Reset filter
+    filter_state = "all";
+    d3.select("#lc")
+      .selectAll("g").attr("visibility", "visible");
+  } else {
+  // Set filter
+  filter_state = area;
   d3.select("#lc")
     .selectAll("g").attr("visibility", "hidden");
   d3.select("#lc")
     .selectAll("g[city='" + area + "']").attr("visibility", "visible");
+  }
 }
 
 </script>

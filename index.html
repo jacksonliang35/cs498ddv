@@ -30,6 +30,7 @@ div {
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <html><body>
 <h2 id="hd">Hello World!</h2>
+<p id="desc"></p>
 <svg id="viz" width="1000" height="500" class="chart"></svg>
 <script>
 // FSM
@@ -53,7 +54,8 @@ var svg = d3.select("#viz"),
     y = d3.scaleLinear()
           .rangeRound([height, 0]),
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")"),
-    linechart = g.append("g").attr("id", "lc");
+    linechart = g.append("g").attr("id", "lc"),
+    barchart = g.append("g").attr("id", "bc");
 
 // Define line function
 var linefunction = d3.line().x(function(d) { return x(d.Year); })
@@ -73,7 +75,7 @@ var tooltip = d3.select("body")
   .style("visibility", "hidden");
 
 // Button
-var btn = [0, 1, 2, 3];
+var btn = [0, 1, 2, 3, 4];
 d3.select("body").append("g").attr("id", "btn")
   .selectAll("div")
   .data(btn)
@@ -85,22 +87,72 @@ d3.select("body").append("g").attr("id", "btn")
   .style("border", "2px solid purple")
   .style("width", "35px")
   // .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-  .on("click", function(d){ if (d === 1) return alert(d);
-                            else if (d === 2) return display_first();
+  .on("click", function(d){ if (d === 1) return display_first();
+                            else if (d === 2) return display_second();
                             else if (d === 3) return display_total();
+                            else if (d === 4) return display_next(cur_state);
                             else return alert("About Page");
                           })
-  .text(function(d) { if (d === 0) return "About"; else return d; });
+  .text(function(d) { if (d === 0) return "About";
+                      else if (d === 4) return "Next";
+                      else return d;
+                    });
+
+  // Add x axis
+  g.append("g")
+      .attr("class", "axis axis--x")
+      .attr("id", "xaxis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x).ticks(20, "s").tickFormat(d3.format("")));
+  g.append("text")
+      .attr("transform", "translate(" + (width/2) + " ," + (height + margin.top) + ")")
+      .text("Year");
+
+
+  // Add y Axis
+  g.append("g")
+      .attr("class", "axis axis--y")
+      .attr("id", "yaxis");
+  g.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x",0 - (height / 2))
+      .attr("dy", "1em")
+      .text("Hours");
+
+  // Legend
+  var legend = g.selectAll(".legend")
+    .data(labels)
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  legend.append("rect")
+      .attr("x", width + 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .attr("fill", function(d) { return color[d]; })
+      .on("click", function(d) { return filter(d); });
+
+  legend.append("text")
+      .attr("x", width + 44)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .attr("text-anchor", "start")
+      .text(function(d) { return d; });
 
 display_first()
 
-/********* below are for line chart **********/
 function display_first(){
+  // For state control
   if (cur_state === 1) return;
   cur_state = 1;
   d3.select("#b1").style("background", "purple");
   d3.select("#b2").style("background", "white");
   d3.select("#b3").style("background", "white");
+  // Write description
+  d3.select("#desc").text("This is the 1st chart!");
+  // Read data
   d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
     for (var i = 2; i < columns.length; ++i) d[columns[i]] = +d[columns[i]];
     return d;
@@ -108,7 +160,91 @@ function display_first(){
     if (error) throw error;
 
     // Get y axis range
-    y.domain([0,90]);
+    y.domain([0,90])
+    d3.select("#yaxis").transition().duration(750).call(d3.axisLeft(y).tickFormat(d3.format("")));
+
+    // Remove previous charts
+    barchart.selectAll("*").remove();
+    linechart.selectAll("*").remove();
+
+    // Reformat data
+    var vizdata = [],
+        // vizdata2 = [],
+        columns = Object.keys(data[0]),
+        ignore_list = ["UrbanArea", "PopulationGroup", "STPercent", "STRank", "LTPercent", "LTRank"];
+
+    for (var i = 0; i < data.length; i++){
+      var temp = [];
+      for (var j = 0; j < 21; j++){
+        var col = columns[j];
+        if(!ignore_list.includes(col)){
+          temp.push({"UrbanArea": data[i].UrbanArea,
+                     "PopulationGroup": data[i].PopulationGroup,
+                     "Hours": +data[i][col],
+                     "Year": +col});
+          // vizdata2.push({"UrbanArea": data[i].UrbanArea,
+          //            "PopulationGroup": data[i].PopulationGroup,
+          //            "Hours": +data[i][col],
+          //            "Year": +col});
+        }
+      }
+      vizdata.push(temp);
+    }
+
+    for (var i = 0; i < vizdata.length; i++){
+      var line = linechart.append("g")
+                          .attr("id", "ln"+i)
+                          .attr("city", vizdata[i][0].PopulationGroup);
+      // Line
+      line.append("path")
+          .attr("stroke", color[vizdata[i][0].PopulationGroup])
+          .datum(vizdata[i])
+          .attr("class", "line")
+          .attr("d", linefunction);
+      // Dots
+      line.selectAll(".dot")
+          .data(vizdata[i])
+          .enter()
+          .append("circle")
+          .attr("class", "dot")
+          .attr("cx", function(d) { return x(d.Year) })
+          .attr("cy", function(d) { return y(d.Hours) })
+          .attr("fill", function(d) { return color[d.PopulationGroup]})
+          .attr("stroke", function(d) { return color[d.PopulationGroup]})
+          // Mouse event
+          .on("mouseover", function(d){ tooltip.text(d.UrbanArea + "     :     " + d.Hours);
+                                        return tooltip.style("visibility", "visible"); })
+          .on("mouseout", function(){ return tooltip.style("visibility", "hidden"); })
+    }
+
+  });
+}
+
+
+/********* below are for line chart 2 **********/
+function display_second(){
+  // For state control
+  if (cur_state === 2) return;
+  cur_state = 2;
+  d3.select("#b1").style("background", "white");
+  d3.select("#b2").style("background", "purple");
+  d3.select("#b3").style("background", "white");
+  // Write description
+  d3.select("#desc").text("This is the 2nd chart!");
+  // Read data
+  d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/cs498ddv_data.csv", function(d, i, columns) {
+    for (var i = 2; i < columns.length; ++i) d[columns[i]] = +d[columns[i]];
+    return d;
+  }, function(error, data) {
+    if (error) throw error;
+
+    // Get y axis range
+    y.domain([0,90])
+    d3.select("#yaxis").transition().duration(750).call(d3.axisLeft(y).tickFormat(d3.format("")));
+
+    // Remove previous charts
+    barchart.selectAll("*").remove();
+    linechart.selectAll("*").remove();
 
     // Reformat data
     var vizdata = [],
@@ -134,27 +270,6 @@ function display_first(){
       vizdata.push(temp);
     }
 
-    // Add x axis
-    g.append("g")
-        .attr("class", "axis axis--x")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x).ticks(20, "s").tickFormat(d3.format("")));
-    g.append("text")
-        .attr("transform", "translate(" + (width/2) + " ," + (height + margin.top) + ")")
-        .text("Year");
-
-
-    // Add y Axis
-    g.append("g")
-        .attr("class", "axis axis--y")
-        .call(d3.axisLeft(y).tickFormat(d3.format("")));
-    g.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 0 - margin.left)
-        .attr("x",0 - (height / 2))
-        .attr("dy", "1em")
-        .text("Hours");
-
     for (var i = 0; i < vizdata.length; i++){
       var line = linechart.append("g")
                           .attr("id", "ln"+i)
@@ -176,45 +291,30 @@ function display_first(){
           .attr("fill", function(d) { return color[d.PopulationGroup]})
           .attr("stroke", function(d) { return color[d.PopulationGroup]})
           // Mouse event
-          .on("mouseover", function(d){ tooltip.text(d.UrbanArea + " \n " + d.Hours); return tooltip.style("visibility", "visible"); })
+          .on("mouseover", function(d){ tooltip.text(d.UrbanArea + "     :     " + d.Hours);
+                                        return tooltip.style("visibility", "visible"); })
           .on("mouseout", function(){ return tooltip.style("visibility", "hidden"); })
     }
 
   });
 
-    // Legend
-    var legend = g.selectAll(".legend")
-      .data(labels)
-      .enter().append("g")
-        .attr("class", "legend")
-        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
-    legend.append("rect")
-        .attr("x", width + 18)
-        .attr("width", 18)
-        .attr("height", 18)
-        .attr("fill", function(d) { return color[d]; })
-        .on("click", function(d) { return filter(d); });
-
-    legend.append("text")
-        .attr("x", width + 44)
-        .attr("y", 9)
-        .attr("dy", ".35em")
-        .attr("text-anchor", "start")
-        .text(function(d) { return d; });
 }
 
 
 
 /********* below are for bar chart, called by an update function **********/
 function display_total(){
+  // For state control
   if (cur_state === 3) return;
   cur_state = 3;
   d3.select("#b1").style("background", "white");
   d3.select("#b2").style("background", "white");
   d3.select("#b3").style("background", "purple");
-  // Close tooltip
+  // Close opened tooltip
   tooltip.style("visibility", "hidden");
+  // Write description
+  d3.select("#desc").text("This is the 3rd chart!");
   d3.csv("https://raw.githubusercontent.com/jacksonliang35/cs498ddv/master/data/total_count.csv", function(d, i, columns) {
     for (var i = 0, t = 0; i < columns.length - 1; ++i) t += d[columns[i]] = +d[columns[i]];
     d.total = t;
@@ -225,8 +325,9 @@ function display_total(){
     // console.log(data);
     // Change y axis domain
     y.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
-    linechart.remove();
-    var barchart = g.append("g");
+    d3.select("#yaxis").transition().duration(750).call(d3.axisLeft(y).tickFormat(d3.format("")));
+    linechart.selectAll("*").remove();
+
 
     // Apply transition
     // var svg = d3.select("svg").transition();
@@ -243,8 +344,20 @@ function display_total(){
         .attr("x", function(d) { return x(d.data.Year); })
         .attr("y", function(d) { return y(d[1]); })
         .attr("height", function(d) { return y(d[0]) - y(d[1]); })
-        .attr("width", 20);
+        .attr("width", 20)
+        .on("mouseover", function(d){ tooltip.text("Very large:" + d.data["Very large"] + "          " +
+                                                   "Large:" + d.data.Large + "          " +
+                                                   "Medium:" + d.data.Medium + "          " +
+                                                   "Small:" + d.data.Small + "          " +
+                                                   "Total: " + d.data.total); return tooltip.style("visibility", "visible"); })
+        .on("mouseout", function(){ return tooltip.style("visibility", "hidden"); });
   });
+}
+
+/********* function to display next scene **********/
+function display_next(state){
+  if (state === 1) display_second();
+  else if (state === 2) display_total();
 }
 
 /********** function to filter color *********/
